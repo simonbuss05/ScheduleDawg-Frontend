@@ -1,0 +1,36 @@
+.meeting-form {
+  background: #FAFAF8;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  max-width: 420px;
+}
+
+.meeting-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+  margin-bottom: 12px;
+}
+
+.meeting-form input {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.time-row {
+  display: flex;
+  gap: 16px;
+}
+
+.time-row label {
+  flex: 1;
+}

@@ -1,0 +1,100 @@
+.back-link {
+  color: #4B5563;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.back-link:hover {
+  color: #BA0C2F;
+}
+
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.course-header h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  color: #131313;
+  margin: 0 0 4px;
+}
+
+.course-header .course-professor {
+  color: #4B5563;
+  font-size: 15px;
+  margin: 0;
+}
+
+.detail-section {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  margin: 0;
+}
+
+.empty-state {
+  color: #4B5563;
+  font-size: 14px;
+}
+
+.meeting-list,
+.assignment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meeting-row,
+.assignment-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  background: #FAFAF8;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.meeting-day {
+  font-weight: 600;
+  color: #BA0C2F;
+  width: 80px;
+}
+
+.btn-danger {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #BA0C2F;
+  color: #BA0C2F;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-danger:hover {
+  background: #BA0C2F;
+  color: #fff;
+}

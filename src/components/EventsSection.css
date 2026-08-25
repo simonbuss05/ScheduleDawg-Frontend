@@ -1,0 +1,23 @@
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  background: #FAFAF8;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.event-time {
+  color: #4B5563;
+  font-size: 13px;
+}

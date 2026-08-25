@@ -1,0 +1,53 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  color: #131313;
+  margin: 0;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.course-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-left: 4px solid #BA0C2F;
+  border-radius: 8px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.course-card h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  color: #131313;
+  margin: 0 0 4px;
+}
+
+.course-name {
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.course-professor,
+.course-hours {
+  font-size: 14px;
+  color: #4B5563;
+  margin: 2px 0;
+}
+
+.error {
+  color: #BA0C2F;
+}

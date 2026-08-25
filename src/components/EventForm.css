@@ -1,0 +1,27 @@
+.event-form {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  max-width: 380px;
+}
+
+.event-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+  margin-bottom: 10px;
+}
+
+.event-form input {
+  display: block;
+  width: 100%;
+  padding: 7px 9px;
+  margin-top: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}

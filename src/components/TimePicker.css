@@ -1,0 +1,25 @@
+.time-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.time-picker select,
+.time-picker-minute {
+  padding: 7px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.time-picker-minute {
+  width: 40px;
+  text-align: center;
+}
+
+.time-picker-colon {
+  font-weight: 600;
+  color: #4B5563;
+}
