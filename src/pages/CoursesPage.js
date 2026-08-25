@@ -11,25 +11,30 @@ function CoursesPage() {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
     getCourses()
       .then((res) => setCourses(res.data))
       .catch(() => setError('Could not load courses. Is the backend running?'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
-  const handleCourseCreated = (newCourse) => {
-    setCourses([...courses, newCourse]);
+  const handleCourseCreated = () => {
     setShowForm(false);
+    load();
   };
 
   if (loading) return <p>Loading courses...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
-    <div>
+    <div className="page-shell">
       <div className="page-header">
-        <h2 className="page-title">Your Courses</h2>
+        <h2 className="page-title">Manage Courses</h2>
         {!showForm && (
           <button className="btn-primary" onClick={() => setShowForm(true)}>
             + Add Course
@@ -38,26 +43,27 @@ function CoursesPage() {
       </div>
 
       {showForm && (
-        <CourseForm
-          onCourseCreated={handleCourseCreated}
-          onCancel={() => setShowForm(false)}
-        />
+        <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowForm(false)} />
       )}
 
-      {courses.length === 0 && !showForm ? (
-        <p>No courses yet. Add your first one to get started.</p>
-      ) : (
-        <div className="course-grid">
-          {courses.map((course) => (
-            <Link to={`/courses/${course.id}`} key={course.id} className="course-card">
-              <h3>{course.code}</h3>
-              <p className="course-name">{course.name}</p>
-              <p className="course-professor">{course.professor}</p>
-              <p className="course-hours">{course.creditHours} credit hours</p>
-            </Link>
-          ))}
-        </div>
-      )}
+      <div className="scroll-region">
+        {courses.length === 0 ? (
+          <p>No courses yet.</p>
+        ) : (
+          <div className="course-grid">
+            {courses.map((course) => (
+              <Link to={`/courses/${course.id}`} key={course.id} className="course-card">
+                <div className="course-card-top">
+                  <h3>{course.name}</h3>
+                  <span className="course-card-chevron">&rsaquo;</span>
+                </div>
+                <p className="course-code-sub">{course.code}</p>
+                <p className="course-professor">{course.professor}</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

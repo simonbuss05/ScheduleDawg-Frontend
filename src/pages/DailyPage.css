@@ -1,0 +1,299 @@
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  color: #131313;
+  margin: 0;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.week-range {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4B5563;
+  min-width: 220px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.current-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #fff;
+  background: #BA0C2F;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.today-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.today-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.nav-arrows .btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.nav-arrows .btn-secondary:hover {
+  background: #e6e6e6;
+}
+
+.daily-split {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+  align-items: start;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.daily-left,
+.daily-right {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.detail-section {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.daily-left .detail-section {
+  margin-bottom: 0;
+}
+
+.daily-right .detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  margin: 0;
+}
+
+.placeholder-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #4B5563;
+  background: #FAFAF8;
+  border: 1px solid #eee;
+  padding: 4px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.empty-state {
+  color: #4B5563;
+  font-size: 13px;
+}
+
+.map-placeholder {
+  background: #FAFAF8;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.map-placeholder-icon {
+  font-size: 32px;
+}
+
+.map-placeholder-text {
+  font-size: 13px;
+  color: #4B5563;
+}
+
+.route-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.route-step {
+  display: flex;
+  flex-direction: column;
+}
+
+.route-stop {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.route-stop-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #131313;
+  min-width: 70px;
+  padding-top: 1px;
+}
+
+.route-stop-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.route-stop-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #131313;
+}
+
+.route-stop-sub {
+  font-size: 11px;
+  color: #4B5563;
+}
+
+.route-leg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0 3px 82px;
+  color: #4B5563;
+  font-size: 12px;
+}
+
+.route-leg-icon {
+  font-size: 13px;
+}
+
+.daily-meeting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daily-meeting-card {
+  background: #BA0C2F;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.daily-meeting-card .meeting-block-name {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.daily-meeting-card .meeting-block-name:hover {
+  text-decoration: underline;
+}
+
+.daily-meeting-card .meeting-block-code,
+.daily-meeting-card .meeting-block-time,
+.daily-meeting-card .meeting-block-duration,
+.daily-meeting-card .meeting-block-location {
+  opacity: 0.85;
+  font-size: 12px;
+}
+
+.mini-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mini-list-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: #FAFAF8;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.mini-time {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4B5563;
+  min-width: 52px;
+}
+
+.mini-course-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mini-title {
+  font-weight: 600;
+}
+
+.mini-course-sub {
+  font-size: 11px;
+  color: #4B5563;
+}

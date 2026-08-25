@@ -98,3 +98,35 @@
   background: #BA0C2F;
   color: #fff;
 }
+
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.fixed-top {
+  flex-shrink: 0;
+}
+
+.scroll-region {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #4B5563;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.back-link:hover {
+  color: #BA0C2F;
+}

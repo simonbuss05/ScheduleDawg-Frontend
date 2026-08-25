@@ -1,8 +1,92 @@
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
 .page-title {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 32px;
   color: #131313;
-  margin-bottom: 24px;
+  margin: 0;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.week-range {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4B5563;
+  min-width: 160px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.current-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #fff;
+  background: #BA0C2F;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.today-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.today-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.nav-arrows .btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.nav-arrows .btn-secondary:hover {
+  background: #e6e6e6;
+}
+
+.scroll-region {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .week-grid {
@@ -19,7 +103,7 @@
 }
 
 .grid-header-spacer {
-  height: 40px;
+  height: 48px;
   border-bottom: 1px solid #eee;
 }
 
@@ -42,17 +126,40 @@
   border-right: none;
 }
 
+.day-column.is-today {
+  background: #FFFBF0;
+}
+
 .day-header {
-  height: 40px;
+  height: 48px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px solid #eee;
+  background: #FAFAF8;
+}
+
+.day-header span:first-child {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 600;
   font-size: 15px;
   color: #131313;
-  border-bottom: 1px solid #eee;
-  background: #FAFAF8;
+}
+
+.day-header-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #4B5563;
+}
+
+.today-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #BA0C2F;
 }
 
 .day-body {
@@ -66,18 +173,34 @@
   background: #BA0C2F;
   color: #fff;
   border-radius: 4px;
-  padding: 4px 6px;
+  padding: 5px 6px;
   font-size: 11px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
-.meeting-block-code {
+.meeting-block-name {
+  color: #fff;
+  text-decoration: none;
   font-weight: 700;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
+.meeting-block-name:hover {
+  text-decoration: underline;
+}
+
+.meeting-block-code {
+  opacity: 0.75;
+  font-size: 10px;
+}
+
+.meeting-block-time,
+.meeting-block-duration,
 .meeting-block-location {
   opacity: 0.85;
+  font-size: 10px;
 }

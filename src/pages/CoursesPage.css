@@ -1,8 +1,15 @@
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
 .page-title {
@@ -12,9 +19,15 @@
   margin: 0;
 }
 
+.scroll-region {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .course-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
@@ -22,30 +35,55 @@
   background: #fff;
   border: 1px solid #eee;
   border-left: 4px solid #BA0C2F;
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 18px;
   text-decoration: none;
   color: inherit;
   display: block;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.course-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .course-card h3 {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
+  font-size: 19px;
   color: #131313;
-  margin: 0 0 4px;
+  margin: 0;
 }
 
-.course-name {
-  font-weight: 600;
-  margin: 0 0 8px;
+.course-card-chevron {
+  font-size: 22px;
+  color: #ccc;
+  font-weight: 700;
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
-.course-professor,
-.course-hours {
+.course-card:hover .course-card-chevron {
+  color: #BA0C2F;
+  transform: translateX(2px);
+}
+
+.course-code-sub {
+  font-size: 12px;
+  font-weight: 700;
+  color: #BA0C2F;
+  margin: 4px 0 6px;
+}
+
+.course-professor {
   font-size: 14px;
   color: #4B5563;
-  margin: 2px 0;
+  margin: 0;
 }
 
 .error {

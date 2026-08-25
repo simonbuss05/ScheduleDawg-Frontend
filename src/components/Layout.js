@@ -8,9 +8,11 @@ function Layout() {
       <aside className="sidebar">
         <h1 className="sidebar-logo">ScheduleDawg</h1>
         <nav className="sidebar-nav">
-          <NavLink to="/" end className="nav-link">Courses</NavLink>
-          <NavLink to="/weekly" className="nav-link">Weekly</NavLink>
-          <NavLink to="/daily" className="nav-link">Daily & Map</NavLink>
+          <NavLink to="/" end className="nav-link">Weekly</NavLink>
+          <NavLink to="/daily" className="nav-link">Daily</NavLink>
+          <NavLink to="/assignments" className="nav-link">Assignments</NavLink>
+          <NavLink to="/events" className="nav-link">Events</NavLink>
+          <NavLink to="/courses" className="nav-link">Courses</NavLink>
         </nav>
       </aside>
       <main className="content">

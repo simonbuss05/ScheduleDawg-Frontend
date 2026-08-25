@@ -1,0 +1,169 @@
+// src/pages/EventsPage.js
+import { useEffect, useState } from 'react';
+import { getCourses } from '../api/courseApi';
+import { getMeetings } from '../api/meetingApi';
+import { getEvents, createEvent, deleteEvent } from '../api/eventApi';
+import { formatTime } from '../utils/time';
+import { formatDateWithWeekday, isPastDate, isThisWeek } from '../utils/dateUtils';
+import EventForm from '../components/EventForm';
+import './EventsPage.css';
+
+function EventsPage() {
+  const [courses, setCourses] = useState([]);
+  const [meetingsByCourse, setMeetingsByCourse] = useState({});
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState('');
+
+  const load = () => {
+    setLoading(true);
+    getCourses().then((coursesRes) => {
+      const courseList = coursesRes.data;
+      setCourses(courseList);
+
+      return Promise.all(courseList.map((c) => getMeetings(c.id))).then((meetingResponses) => {
+        const meetingMap = {};
+        courseList.forEach((c, i) => {
+          meetingMap[c.id] = meetingResponses[i].data;
+        });
+        setMeetingsByCourse(meetingMap);
+
+        const allMeetings = meetingResponses.flatMap((res, i) =>
+          res.data.map((m) => ({ ...m, course: courseList[i] }))
+        );
+
+        return Promise.all(allMeetings.map((m) => getEvents(m.id))).then((eventResponses) => {
+          const combined = eventResponses.flatMap((res, i) =>
+            res.data.map((ev) => ({ ...ev, meeting: allMeetings[i] }))
+          );
+          setEvents(combined);
+        });
+      });
+    }).finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const handleDelete = (event) => {
+    deleteEvent(event.meeting.id, event.id).then(() => {
+      setEvents(events.filter((e) => e.id !== event.id));
+    });
+  };
+
+  const handleCreated = () => {
+    setShowForm(false);
+    setSelectedCourseId('');
+    load();
+  };
+
+  if (loading) return <p>Loading events...</p>;
+
+  const selectedMeetings = meetingsByCourse[selectedCourseId] || [];
+
+  const byDate = (a, b) => a.eventDate.localeCompare(b.eventDate);
+
+  const thisWeek = events
+    .filter((ev) => !isPastDate(ev.eventDate) && isThisWeek(ev.eventDate))
+    .sort(byDate);
+
+  const upcoming = events
+    .filter((ev) => !isPastDate(ev.eventDate) && !isThisWeek(ev.eventDate))
+    .sort(byDate);
+
+  const past = events
+    .filter((ev) => isPastDate(ev.eventDate))
+    .sort(byDate);
+
+  const renderRow = (ev) => (
+    <li
+      key={ev.id}
+      className={`event-full-row ${isPastDate(ev.eventDate) ? 'past' : ''}`}
+    >
+      <div className="cell-course">
+        <span className="cell-course-name">{ev.meeting.course.name}</span>
+        <span className="cell-course-code">{ev.meeting.course.code}</span>
+      </div>
+      <span className="event-title">{ev.title}</span>
+      <span className="event-date">{formatDateWithWeekday(ev.eventDate)}</span>
+      <span className="event-time">
+        {formatTime(ev.meeting.startTime)} – {formatTime(ev.meeting.endTime)}
+      </span>
+      <button className="btn-danger" onClick={() => handleDelete(ev)}>Delete</button>
+    </li>
+  );
+
+  const tableHeader = (
+    <div className="event-table-header">
+      <span>Course</span>
+      <span>Event</span>
+      <span>Date</span>
+      <span>Time</span>
+      <span></span>
+    </div>
+  );
+
+  const renderTable = (list, emptyMessage) => (
+    <div className="event-table">
+      {tableHeader}
+      {list.length === 0 ? (
+        <p className="table-empty-state">{emptyMessage}</p>
+      ) : (
+        <ul className="event-full-list">
+          {list.map(renderRow)}
+        </ul>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="page-shell">
+      <div className="page-header">
+        <h2 className="page-title">Events</h2>
+        {!showForm && (
+          <button className="btn-primary" onClick={() => setShowForm(true)}>
+            + Add Event
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <div className="new-event-panel">
+          <label>
+            Course
+            <select value={selectedCourseId} onChange={(e) => setSelectedCourseId(e.target.value)}>
+              <option value="">Select a course...</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
+              ))}
+            </select>
+          </label>
+
+          {selectedCourseId && (
+            <EventForm
+              meetings={selectedMeetings}
+              createEventFn={createEvent}
+              onCreated={handleCreated}
+              onCancel={() => setShowForm(false)}
+            />
+          )}
+        </div>
+      )}
+
+      <div className="scroll-region">
+        <h3 className="section-label">This Week</h3>
+        {renderTable(thisWeek, 'Nothing this week.')}
+
+        <h3 className="section-label">Upcoming</h3>
+        {renderTable(upcoming, 'Nothing further out.')}
+
+        <h3 className="section-label">Past</h3>
+        {renderTable(past, 'No past events.')}
+      </div>
+    </div>
+  );
+}
+
+export default EventsPage;

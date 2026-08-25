@@ -1,24 +1,26 @@
 .app-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100%;
   background: #FAFAF8;
 }
 
 .sidebar {
-  width: 220px;
+  width: 240px;
   background: #131313;
   color: #FAFAF8;
   padding: 24px 16px;
   flex-shrink: 0;
+  overflow-y: auto;
 }
 
 .sidebar-logo {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #BA0C2F;
   margin-bottom: 32px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .sidebar-nav {
@@ -49,5 +51,9 @@
 
 .content {
   flex: 1;
+  height: 100%;
+  overflow: hidden;
   padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
 }
