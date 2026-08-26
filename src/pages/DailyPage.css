@@ -8,13 +8,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-shrink: 0;
 }
 
 .page-title {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
+  font-size: 28px;
   color: #131313;
   margin: 0;
 }
@@ -85,15 +85,149 @@
 
 .daily-split {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 20px;
-  align-items: start;
+  grid-template-columns: 2.3fr 1fr;
+  gap: 16px;
+  align-items: stretch;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
-.daily-left,
+.daily-left {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.daily-map-wrapper {
+  flex: 4;
+  min-height: 0;
+}
+
+.map-placeholder {
+  background: #FAFAF8;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.map-placeholder-icon {
+  font-size: 40px;
+}
+
+.map-placeholder-text {
+  font-size: 14px;
+  color: #4B5563;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.map-placeholder-cta {
+  margin-top: 6px;
+  text-decoration: none;
+}
+
+.route-overview {
+  flex: 1;
+  min-height: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.route-leg-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.route-leg-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 12px;
+}
+
+.route-leg-row:last-child {
+  border-bottom: none;
+}
+
+.route-leg-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.route-leg-path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #131313;
+  flex-wrap: wrap;
+}
+
+.route-leg-arrow {
+  color: #BA0C2F;
+  font-weight: 700;
+}
+
+.tight-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: #BA0C2F;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.route-leg-stats {
+  color: #4B5563;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.route-total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.route-total-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #4B5563;
+}
+
+.route-total-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: #131313;
+}
+
 .daily-right {
   height: 100%;
   overflow-y: auto;
@@ -103,12 +237,8 @@
   background: #fff;
   border: 1px solid #eee;
   border-radius: 8px;
-  padding: 18px;
-  margin-bottom: 16px;
-}
-
-.daily-left .detail-section {
-  margin-bottom: 0;
+  padding: 12px 14px;
+  margin-bottom: 10px;
 }
 
 .daily-right .detail-section:last-child {
@@ -119,130 +249,41 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .section-header h3 {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
+  font-size: 15px;
   margin: 0;
-}
-
-.placeholder-badge {
-  font-size: 10px;
-  font-weight: 600;
-  color: #4B5563;
-  background: #FAFAF8;
-  border: 1px solid #eee;
-  padding: 4px 9px;
-  border-radius: 20px;
-  white-space: nowrap;
 }
 
 .empty-state {
   color: #4B5563;
-  font-size: 13px;
-}
-
-.map-placeholder {
-  background: #FAFAF8;
-  border: 1px dashed #ddd;
-  border-radius: 8px;
-  height: 260px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.map-placeholder-icon {
-  font-size: 32px;
-}
-
-.map-placeholder-text {
-  font-size: 13px;
-  color: #4B5563;
-}
-
-.route-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.route-step {
-  display: flex;
-  flex-direction: column;
-}
-
-.route-stop {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.route-stop-time {
-  font-size: 13px;
-  font-weight: 700;
-  color: #131313;
-  min-width: 70px;
-  padding-top: 1px;
-}
-
-.route-stop-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.route-stop-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #131313;
-}
-
-.route-stop-sub {
-  font-size: 11px;
-  color: #4B5563;
-}
-
-.route-leg {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 0 3px 82px;
-  color: #4B5563;
   font-size: 12px;
-}
-
-.route-leg-icon {
-  font-size: 13px;
 }
 
 .daily-meeting-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .daily-meeting-card {
   background: #BA0C2F;
   color: #fff;
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 7px 10px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .daily-meeting-card .meeting-block-name {
   color: #fff;
   text-decoration: none;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .daily-meeting-card .meeting-block-name:hover {
@@ -254,7 +295,7 @@
 .daily-meeting-card .meeting-block-duration,
 .daily-meeting-card .meeting-block-location {
   opacity: 0.85;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .mini-list {
@@ -263,24 +304,24 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .mini-list-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
+  gap: 8px;
+  padding: 5px 8px;
   background: #FAFAF8;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .mini-time {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #4B5563;
-  min-width: 52px;
+  min-width: 46px;
 }
 
 .mini-course-info {
@@ -291,9 +332,10 @@
 
 .mini-title {
   font-weight: 600;
+  font-size: 12px;
 }
 
 .mini-course-sub {
-  font-size: 11px;
+  font-size: 10px;
   color: #4B5563;
 }

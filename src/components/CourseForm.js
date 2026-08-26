@@ -4,6 +4,7 @@ import { createCourse } from '../api/courseApi';
 import { createMeeting } from '../api/meetingApi';
 import DayPicker from './DayPicker';
 import TimePicker from './TimePicker';
+import BuildingAutocomplete from './BuildingAutocomplete';
 import './CourseForm.css';
 
 let entryId = 0;
@@ -13,7 +14,8 @@ function newMeetingEntry() {
     selectedDays: [],
     startTime: '09:00',
     endTime: '09:50',
-    location: '',
+    building: '',
+    roomNumber: '',
   };
 }
 
@@ -51,7 +53,7 @@ function CourseForm({ onCourseCreated, onCancel }) {
         const newCourse = courseRes.data;
 
         const validEntries = meetingEntries.filter(
-          (entry) => entry.selectedDays.length > 0 && entry.location.trim()
+          (entry) => entry.selectedDays.length > 0 && entry.building.trim()
         );
 
         const meetingCreations = validEntries.flatMap((entry) =>
@@ -60,7 +62,8 @@ function CourseForm({ onCourseCreated, onCancel }) {
               dayOfWeek: day,
               startTime: entry.startTime,
               endTime: entry.endTime,
-              location: entry.location,
+              building: entry.building,
+              roomNumber: entry.roomNumber,
             })
           )
         );
@@ -130,14 +133,24 @@ function CourseForm({ onCourseCreated, onCancel }) {
                 />
               </label>
             </div>
-            <label>
-              Location
-              <input
-                value={entry.location}
-                onChange={(e) => updateEntry(entry.key, { location: e.target.value })}
-                placeholder="MLC 148"
-              />
-            </label>
+            <div className="time-row">
+              <label>
+                Building
+                <BuildingAutocomplete
+                  value={entry.building}
+                  onChange={(val) => updateEntry(entry.key, { building: val })}
+                  placeholder="Boyd"
+                />
+              </label>
+              <label>
+                Room
+                <input
+                  value={entry.roomNumber}
+                  onChange={(e) => updateEntry(entry.key, { roomNumber: e.target.value })}
+                  placeholder="0322"
+                />
+              </label>
+            </div>
             {meetingEntries.length > 1 && (
               <button type="button" className="remove-entry-btn" onClick={() => removeEntry(entry.key)}>
                 Remove

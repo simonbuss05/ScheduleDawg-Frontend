@@ -7,6 +7,7 @@ import CoursesPage from './pages/CoursesPage';
 import CourseDetailPage from './pages/CourseDetailPage';
 import AssignmentsPage from './pages/AssignmentsPage';
 import EventsPage from './pages/EventsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/courses/:courseId" element={<CourseDetailPage />} />
           <Route path="/assignments" element={<AssignmentsPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

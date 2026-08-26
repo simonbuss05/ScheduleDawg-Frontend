@@ -1,5 +1,5 @@
 // src/pages/WeeklyPage.js
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllMeetingsWithCourses, getAllEventsWithDetails } from '../api/scheduleApi';
 import { getMonday, addDays, toDateString, formatDayHeader, formatWeekRange } from '../utils/dateUtils';
@@ -11,7 +11,8 @@ import './WeeklyPage.css';
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
 const START_HOUR = 8;
 const END_HOUR = 18;
-const HOUR_HEIGHT = 80;
+const HOUR_HEIGHT = 95;
+const SCROLL_PADDING = 20;
 
 function timeToMinutesFromStart(timeString) {
   const [hours, minutes] = timeString.split(':').map(Number);
@@ -24,6 +25,7 @@ function WeeklyPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCourseForm, setShowCourseForm] = useState(false);
+  const scrollRef = useRef(null);
 
   const load = () => {
     setLoading(true);
@@ -39,6 +41,16 @@ function WeeklyPage() {
   useEffect(() => {
     load();
   }, []);
+
+  useEffect(() => {
+    if (loading || meetings.length === 0 || !scrollRef.current) return;
+
+    const earliestStart = Math.min(
+      ...meetings.map((m) => timeToMinutesFromStart(m.startTime))
+    );
+    const scrollTopPx = Math.max(0, earliestStart * (HOUR_HEIGHT / 60) - SCROLL_PADDING);
+    scrollRef.current.scrollTop = scrollTopPx;
+  }, [loading, meetings]);
 
   const handleCourseCreated = () => {
     setShowCourseForm(false);
@@ -91,7 +103,7 @@ function WeeklyPage() {
         <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowCourseForm(false)} />
       )}
 
-      <div className="scroll-region">
+      <div className="scroll-region" ref={scrollRef}>
         <div className="week-grid">
           <div className="time-column">
             <div className="grid-header-spacer" />
@@ -129,23 +141,28 @@ function WeeklyPage() {
                         (timeToMinutesFromStart(m.endTime) - timeToMinutesFromStart(m.startTime)) *
                         (HOUR_HEIGHT / 60);
                       const eventsForMeeting = dayEvents.filter((ev) => ev.meeting.id === m.id);
+                      const locationText = m.building
+                        ? `${m.building}${m.roomNumber ? ` ${m.roomNumber}` : ''}`
+                        : '';
                       return (
                         <div
                           key={m.id}
                           className="meeting-block"
                           style={{ top, height }}
                         >
-                          <Link to={`/courses/${m.course.id}`} className="meeting-block-name">
+                          <Link
+                            to={`/courses/${m.course.id}`}
+                            className="meeting-block-name"
+                            title={m.course.name}
+                          >
                             {m.course.name}
                           </Link>
-                          <span className="meeting-block-code">{m.course.code}</span>
-                          <span className="meeting-block-time">
-                            {formatTime(m.startTime)} – {formatTime(m.endTime)}
+                          <span className="meeting-block-sub">
+                            {m.course.code}{locationText ? ` · ${locationText}` : ''}
                           </span>
-                          <span className="meeting-block-duration">
-                            {formatDuration(m.startTime, m.endTime)}
+                          <span className="meeting-block-sub">
+                            {formatTime(m.startTime)} – {formatTime(m.endTime)} ({formatDuration(m.startTime, m.endTime)})
                           </span>
-                          <span className="meeting-block-location">{m.location}</span>
                           <EventBadge events={eventsForMeeting} />
                         </div>
                       );

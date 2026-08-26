@@ -1,0 +1,93 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  color: #131313;
+  margin: 0;
+}
+
+.settings-section {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 460px;
+}
+
+.settings-section h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  margin: 0 0 6px;
+}
+
+.settings-description {
+  font-size: 13px;
+  color: #4B5563;
+  margin: 0 0 16px;
+}
+
+.settings-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+  margin-bottom: 12px;
+}
+
+.settings-form input {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.address-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr;
+  gap: 10px;
+}
+
+.error {
+  color: #BA0C2F;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.success {
+  color: #16a34a;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.resolved-address {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resolved-address-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #4B5563;
+}
+
+.resolved-address-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #131313;
+}

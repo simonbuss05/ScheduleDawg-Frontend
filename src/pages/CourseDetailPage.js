@@ -31,6 +31,10 @@ function CourseDetailPage() {
     });
   };
 
+  const handleMeetingUpdated = (updatedMeeting) => {
+    setMeetings(meetings.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m)));
+  };
+
   const handleDeleteCourse = () => {
     const confirmed = window.confirm(
       `Delete ${course.code}? This will also remove all its meetings, assignments, and events.`
@@ -88,7 +92,13 @@ function CourseDetailPage() {
         ) : (
           <ul className="meeting-list">
             {meetings.map((m) => (
-              <MeetingRow key={m.id} meeting={m} onDeleteMeeting={handleDeleteMeeting} />
+              <MeetingRow
+                key={m.id}
+                meeting={m}
+                courseId={courseId}
+                onDeleteMeeting={handleDeleteMeeting}
+                onMeetingUpdated={handleMeetingUpdated}
+              />
             ))}
           </ul>
         )}

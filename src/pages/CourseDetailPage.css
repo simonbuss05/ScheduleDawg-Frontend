@@ -130,3 +130,17 @@
 .back-link:hover {
   color: #BA0C2F;
 }
+
+.meeting-row-editing {
+  padding: 0;
+}
+
+.meeting-row .btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}

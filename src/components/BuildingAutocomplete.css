@@ -1,0 +1,67 @@
+.building-autocomplete {
+  position: relative;
+  margin-top: 4px;
+}
+
+.building-autocomplete input {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.building-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.building-suggestions li {
+  margin: 0;
+}
+
+.building-suggestions button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.building-suggestions button:hover {
+  background: #F5E6E8;
+}
+
+.building-hint {
+  display: block;
+  font-size: 11px;
+  color: #4B5563;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.building-matched-hint {
+  display: block;
+  font-size: 11px;
+  color: #16a34a;
+  margin-top: 4px;
+  font-weight: 600;
+}

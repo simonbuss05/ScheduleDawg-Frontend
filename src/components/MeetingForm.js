@@ -3,13 +3,15 @@ import { useState } from 'react';
 import { createMeeting } from '../api/meetingApi';
 import DayPicker from './DayPicker';
 import TimePicker from './TimePicker';
+import BuildingAutocomplete from './BuildingAutocomplete';
 import './MeetingForm.css';
 
 function MeetingForm({ courseId, onCreated, onCancel }) {
   const [selectedDays, setSelectedDays] = useState([]);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('09:50');
-  const [location, setLocation] = useState('');
+  const [building, setBuilding] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,15 +23,15 @@ function MeetingForm({ courseId, onCreated, onCancel }) {
       setError('Select at least one day.');
       return;
     }
-    if (!location.trim()) {
-      setError('Location is required.');
+    if (!building.trim()) {
+      setError('Building is required.');
       return;
     }
 
     setSubmitting(true);
     Promise.all(
       selectedDays.map((day) =>
-        createMeeting(courseId, { dayOfWeek: day, startTime, endTime, location })
+        createMeeting(courseId, { dayOfWeek: day, startTime, endTime, building, roomNumber })
       )
     )
       .then((responses) => onCreated(responses.map((res) => res.data)))
@@ -57,10 +59,16 @@ function MeetingForm({ courseId, onCreated, onCancel }) {
         </label>
       </div>
 
-      <label>
-        Location
-        <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="MLC 148" />
-      </label>
+      <div className="time-row">
+        <label>
+          Building
+          <BuildingAutocomplete value={building} onChange={setBuilding} placeholder="Boyd" />
+        </label>
+        <label>
+          Room
+          <input value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} placeholder="0322" />
+        </label>
+      </div>
 
       <div className="form-actions">
         <button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button>
