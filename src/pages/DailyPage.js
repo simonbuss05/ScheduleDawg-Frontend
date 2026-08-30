@@ -1,12 +1,14 @@
 // src/pages/DailyPage.js
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MapPin, Map } from 'lucide-react';
 import { getDaySchedule } from '../api/scheduleApi';
 import { getSettings } from '../api/settingsApi';
 import { addDays, toDateString, formatFullDate, getWeekdayEnum } from '../utils/dateUtils';
 import { formatTime, formatDuration } from '../utils/time';
 import { formatDistance, formatWalkDuration, estimateSteps } from '../utils/walking';
 import { buildDayRoute } from '../utils/dayRoute';
+import { getCachedRoute, setCachedRoute } from '../utils/dayRouteCache';
 import DailyMap from '../components/DailyMap';
 import './DailyPage.css';
 
@@ -81,14 +83,25 @@ function DailyPage() {
       return;
     }
 
+    const cacheKey = `${dateStr}:${todaysMeetings.map((m) => m.id).join(',')}`;
+    const cached = getCachedRoute(cacheKey);
+    if (cached) {
+      setRoute(cached);
+      setRouteError(null);
+      return;
+    }
+
     setRouteLoading(true);
     setRouteError(null);
     buildDayRoute(homeCoords, todaysMeetings)
-      .then(setRoute)
+      .then((result) => {
+        setCachedRoute(cacheKey, result);
+        setRoute(result);
+      })
       .catch((err) => setRouteError(err.message))
       .finally(() => setRouteLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [homeCoords?.lat, homeCoords?.lng, todaysMeetings]);
+  }, [homeCoords?.lat, homeCoords?.lng, todaysMeetings, dateStr]);
 
   if (loading) return <p>Loading your day...</p>;
 
@@ -118,7 +131,7 @@ function DailyPage() {
           <div className="daily-map-wrapper">
             {!homeAddress ? (
               <div className="map-placeholder">
-                <span className="map-placeholder-icon">📍</span>
+                <MapPin size={36} color="#4B5563" />
                 <span className="map-placeholder-text">
                   Add your home address to see walking routes
                 </span>
@@ -128,7 +141,7 @@ function DailyPage() {
               </div>
             ) : todaysMeetings.length === 0 ? (
               <div className="map-placeholder">
-                <span className="map-placeholder-icon">🗺️</span>
+                <Map size={36} color="#4B5563" />
                 <span className="map-placeholder-text">No classes today.</span>
               </div>
             ) : routeLoading ? (

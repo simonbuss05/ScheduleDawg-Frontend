@@ -27,6 +27,10 @@ function MeetingForm({ courseId, onCreated, onCancel }) {
       setError('Building is required.');
       return;
     }
+    if (endTime <= startTime) {
+      setError('End time must be after start time.');
+      return;
+    }
 
     setSubmitting(true);
     Promise.all(
@@ -62,12 +66,10 @@ function MeetingForm({ courseId, onCreated, onCancel }) {
       <div className="time-row">
         <label>
           Building
-          <BuildingAutocomplete value={building} onChange={setBuilding} placeholder="Boyd" />
-        </label>
+<BuildingAutocomplete value={building} onChange={setBuilding} placeholder="Building Name" />        </label>
         <label>
           Room
-          <input value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} placeholder="0322" />
-        </label>
+<input value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} placeholder="Room Number" />        </label>
       </div>
 
       <div className="form-actions">

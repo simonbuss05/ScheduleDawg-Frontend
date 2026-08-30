@@ -1,0 +1,65 @@
+.syllabus-upload-form {
+  background: #FAFAF8;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-picker-btn {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #131313;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.file-picker-btn:hover {
+  border-color: #BA0C2F;
+  color: #BA0C2F;
+}
+
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px 6px 6px 12px;
+  width: fit-content;
+  font-size: 13px;
+}
+
+.file-chip-name {
+  font-weight: 600;
+  color: #131313;
+}
+
+.file-chip-remove {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  line-height: 1;
+  color: #4B5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-chip-remove:hover {
+  background: #BA0C2F;
+  color: #fff;
+}

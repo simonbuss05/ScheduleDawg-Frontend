@@ -1,17 +1,22 @@
 // src/pages/AssignmentsPage.js
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getCourses } from '../api/courseApi';
 import { getAssignments, updateAssignment, deleteAssignment } from '../api/assignmentApi';
-import { formatDateWithWeekday, isThisWeek } from '../utils/dateUtils';
+import { formatDateWithWeekday } from '../utils/dateUtils';
+import { useConfirm } from '../context/ConfirmContext';
 import AssignmentForm from '../components/AssignmentForm';
 import './AssignmentsPage.css';
 
 function AssignmentsPage() {
+  const confirm = useConfirm();
+  const [searchParams] = useSearchParams();
   const [courses, setCourses] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [filterCourseId, setFilterCourseId] = useState('');
 
   const load = () => {
     setLoading(true);
@@ -29,6 +34,9 @@ function AssignmentsPage() {
 
   useEffect(() => {
     load();
+    const preselect = searchParams.get('courseId');
+    if (preselect) setFilterCourseId(preselect);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleToggleComplete = (assignment) => {
@@ -38,7 +46,12 @@ function AssignmentsPage() {
     });
   };
 
-  const handleDelete = (assignment) => {
+  const handleDelete = async (assignment) => {
+    const ok = await confirm({
+      title: 'Delete this assignment?',
+      message: `"${assignment.title}" will be removed.`,
+    });
+    if (!ok) return;
     deleteAssignment(assignment.course.id, assignment.id).then(() => {
       setAssignments(assignments.filter((a) => a.id !== assignment.id));
     });
@@ -53,20 +66,19 @@ function AssignmentsPage() {
   if (loading) return <p>Loading assignments...</p>;
 
   const selectedCourse = courses.find((c) => String(c.id) === selectedCourseId);
+  const filteredCourse = courses.find((c) => String(c.id) === filterCourseId);
 
-  const byDueDate = (a, b) => a.dueDate.localeCompare(b.dueDate);
+  const filtered = filterCourseId
+    ? assignments.filter((a) => String(a.course.id) === filterCourseId)
+    : assignments;
 
-  const thisWeek = assignments
-    .filter((a) => !a.completed && isThisWeek(a.dueDate))
-    .sort(byDueDate);
+  const upcoming = filtered
+    .filter((a) => !a.completed)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 
-  const upcoming = assignments
-    .filter((a) => !a.completed && !isThisWeek(a.dueDate))
-    .sort(byDueDate);
-
-  const completed = assignments
+  const completed = filtered
     .filter((a) => a.completed)
-    .sort(byDueDate);
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 
   const renderRow = (a) => (
     <li key={a.id} className={`assignment-full-row ${a.completed ? 'completed' : ''}`}>
@@ -95,19 +107,6 @@ function AssignmentsPage() {
     </div>
   );
 
-  const renderTable = (list, emptyMessage) => (
-    <div className="assignment-table">
-      {tableHeader}
-      {list.length === 0 ? (
-        <p className="table-empty-state">{emptyMessage}</p>
-      ) : (
-        <ul className="assignment-full-list">
-          {list.map(renderRow)}
-        </ul>
-      )}
-    </div>
-  );
-
   return (
     <div className="page-shell">
       <div className="page-header">
@@ -119,8 +118,26 @@ function AssignmentsPage() {
         )}
       </div>
 
+      <div className="filter-row">
+        <label className="filter-label">
+          Showing
+          <select value={filterCourseId} onChange={(e) => setFilterCourseId(e.target.value)}>
+            <option value="">All Courses</option>
+            {courses.map((c) => (
+              <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
+            ))}
+          </select>
+        </label>
+        {filteredCourse && (
+          <span className="filter-active-chip">
+            Filtered to {filteredCourse.code}
+            <button className="filter-clear-btn" onClick={() => setFilterCourseId('')}>×</button>
+          </span>
+        )}
+      </div>
+
       {showForm && (
-        <div className="new-assignment-panel">
+        <div className="new-assignment-panel card">
           <label>
             Course
             <select value={selectedCourseId} onChange={(e) => setSelectedCourseId(e.target.value)}>
@@ -142,14 +159,29 @@ function AssignmentsPage() {
       )}
 
       <div className="scroll-region">
-        <h3 className="section-label">This Week</h3>
-        {renderTable(thisWeek, 'Nothing due this week.')}
-
         <h3 className="section-label">Upcoming</h3>
-        {renderTable(upcoming, 'Nothing further out.')}
+        <div className="assignment-table">
+          {tableHeader}
+          {upcoming.length === 0 ? (
+            <p className="table-empty-state">Nothing upcoming.</p>
+          ) : (
+            <ul className="assignment-full-list">
+              {upcoming.map(renderRow)}
+            </ul>
+          )}
+        </div>
 
         <h3 className="section-label">Completed</h3>
-        {renderTable(completed, 'No completed assignments yet.')}
+        <div className="assignment-table">
+          {tableHeader}
+          {completed.length === 0 ? (
+            <p className="table-empty-state">No completed assignments yet.</p>
+          ) : (
+            <ul className="assignment-full-list">
+              {completed.map(renderRow)}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

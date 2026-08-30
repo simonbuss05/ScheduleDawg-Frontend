@@ -23,6 +23,10 @@ function MeetingEditForm({ courseId, meeting, onSaved, onCancel }) {
       setError('Building is required.');
       return;
     }
+    if (endTime <= startTime) {
+      setError('End time must be after start time.');
+      return;
+    }
 
     setSubmitting(true);
     updateMeeting(courseId, meeting.id, { dayOfWeek, startTime, endTime, building, roomNumber })

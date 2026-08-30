@@ -1,0 +1,23 @@
+.grade-summary-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.grade-summary-percent {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #131313;
+}
+
+.grade-summary-letter {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.grade-summary-empty,
+.grade-summary-loading {
+  font-size: 12px;
+  color: #4B5563;
+}

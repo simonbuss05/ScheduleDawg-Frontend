@@ -1,0 +1,56 @@
+.review-panel {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.review-panel h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+
+.review-section {
+  margin-bottom: 14px;
+}
+
+.review-section h4 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #4B5563;
+  margin: 0 0 8px;
+}
+
+.review-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.review-row input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.remove-entry-btn {
+  background: none;
+  border: none;
+  color: #BA0C2F;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.empty-state {
+  color: #4B5563;
+  font-size: 13px;
+}

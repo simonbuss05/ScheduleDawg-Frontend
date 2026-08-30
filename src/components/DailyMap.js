@@ -2,9 +2,13 @@
 import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { Home } from 'lucide-react';
 import './DailyMap.css';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
+
+const HOME_ICON_SVG = renderToStaticMarkup(<Home size={14} color="#fff" strokeWidth={2.5} />);
 
 function stopKey(stop) {
   return `${stop.lat.toFixed(6)},${stop.lng.toFixed(6)}`;
@@ -35,11 +39,6 @@ function DailyMap({ stops, legs, legColors }) {
       legs.forEach((leg, i) => {
         const sourceId = `route-leg-${i}`;
         const color = legColors[i % legColors.length];
-
-        // Small fixed offset applied to every leg based on its position
-        // in the day, so any two legs that happen to share a street —
-        // whether an exact round trip or just a converging/diverging
-        // path toward the same point — stay visually separated.
         const offset = (i % 2 === 0 ? 1 : -1) * (4 + Math.floor(i / 2) * 3);
 
         map.addSource(sourceId, {
@@ -116,7 +115,7 @@ function DailyMap({ stops, legs, legColors }) {
           const { stop, index } = entry;
           const el = document.createElement('div');
           el.className = 'daily-map-marker';
-          el.textContent = isHome ? '🏠' : index;
+          el.innerHTML = isHome ? HOME_ICON_SVG : String(index);
 
           let markerOffset = [0, 0];
           if (!isHome && entries.length > 1) {

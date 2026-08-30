@@ -157,3 +157,51 @@
   color: #4B5563;
   font-size: 14px;
 }
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.filter-label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.filter-label select {
+  margin-top: 4px;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  min-width: 220px;
+}
+
+.filter-active-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #F5E6E8;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 6px 5px 12px;
+  border-radius: 20px;
+  margin-top: 18px;
+}
+
+.filter-clear-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}

@@ -46,9 +46,38 @@ function CourseForm({ onCourseCreated, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!form.name.trim() || !form.code.trim() || !form.professor.trim()) {
+      setError('Name, code, and professor are required.');
+      return;
+    }
+    const credits = Number(form.creditHours);
+    if (form.creditHours === '' || isNaN(credits) || credits <= 0 || credits > 12) {
+      setError('Credit hours must be a number between 1 and 12.');
+      return;
+    }
+
+    const entriesWithDaysOrBuilding = meetingEntries.filter(
+      (entry) => entry.selectedDays.length > 0 || entry.building.trim()
+    );
+    for (const entry of entriesWithDaysOrBuilding) {
+      if (entry.selectedDays.length === 0) {
+        setError('Every meeting time needs at least one day selected.');
+        return;
+      }
+      if (!entry.building.trim()) {
+        setError('Every meeting time needs a building.');
+        return;
+      }
+      if (entry.endTime <= entry.startTime) {
+        setError('Each meeting\'s end time must be after its start time.');
+        return;
+      }
+    }
+
     setSubmitting(true);
 
-    createCourse({ ...form, creditHours: Number(form.creditHours) })
+    createCourse({ ...form, creditHours: credits })
       .then((courseRes) => {
         const newCourse = courseRes.data;
 
@@ -86,8 +115,7 @@ function CourseForm({ onCourseCreated, onCancel }) {
 
       <label>
         Course Code
-        <input name="code" value={form.code} onChange={handleChange} placeholder="CSCI 2720" required />
-      </label>
+<input name="code" value={form.code} onChange={handleChange} placeholder="Ex. CSCI 2720" required />      </label>
 
       <label>
         Professor
@@ -101,7 +129,8 @@ function CourseForm({ onCourseCreated, onCancel }) {
           type="number"
           value={form.creditHours}
           onChange={handleChange}
-          min="0"
+          min="1"
+          max="12"
           required
         />
       </label>
@@ -137,18 +166,18 @@ function CourseForm({ onCourseCreated, onCancel }) {
               <label>
                 Building
                 <BuildingAutocomplete
-                  value={entry.building}
-                  onChange={(val) => updateEntry(entry.key, { building: val })}
-                  placeholder="Boyd"
-                />
+  value={entry.building}
+  onChange={(val) => updateEntry(entry.key, { building: val })}
+  placeholder="Building Name"
+/>
               </label>
               <label>
                 Room
                 <input
-                  value={entry.roomNumber}
-                  onChange={(e) => updateEntry(entry.key, { roomNumber: e.target.value })}
-                  placeholder="0322"
-                />
+  value={entry.roomNumber}
+  onChange={(e) => updateEntry(entry.key, { roomNumber: e.target.value })}
+  placeholder="Room Number"
+/>
               </label>
             </div>
             {meetingEntries.length > 1 && (

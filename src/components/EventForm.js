@@ -64,7 +64,7 @@ function EventForm({ meetings, onCreated, onCancel, createEventFn }) {
 
       <label>
         Title
-        <input name="title" value={form.title} onChange={handleChange} placeholder="Test 2" required />
+        <input name="title" value={form.title} onChange={handleChange} placeholder="Ex. Test 2" required />
       </label>
 
       <label>

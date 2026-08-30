@@ -1,20 +1,25 @@
 // src/pages/EventsPage.js
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getCourses } from '../api/courseApi';
 import { getMeetings } from '../api/meetingApi';
 import { getEvents, createEvent, deleteEvent } from '../api/eventApi';
 import { formatTime } from '../utils/time';
 import { formatDateWithWeekday, isPastDate, isThisWeek } from '../utils/dateUtils';
+import { useConfirm } from '../context/ConfirmContext';
 import EventForm from '../components/EventForm';
 import './EventsPage.css';
 
 function EventsPage() {
+  const confirm = useConfirm();
+  const [searchParams] = useSearchParams();
   const [courses, setCourses] = useState([]);
   const [meetingsByCourse, setMeetingsByCourse] = useState({});
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [filterCourseId, setFilterCourseId] = useState('');
 
   const load = () => {
     setLoading(true);
@@ -45,9 +50,17 @@ function EventsPage() {
 
   useEffect(() => {
     load();
+    const preselect = searchParams.get('courseId');
+    if (preselect) setFilterCourseId(preselect);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDelete = (event) => {
+  const handleDelete = async (event) => {
+    const ok = await confirm({
+      title: 'Delete this event?',
+      message: `"${event.title}" will be removed.`,
+    });
+    if (!ok) return;
     deleteEvent(event.meeting.id, event.id).then(() => {
       setEvents(events.filter((e) => e.id !== event.id));
     });
@@ -62,18 +75,23 @@ function EventsPage() {
   if (loading) return <p>Loading events...</p>;
 
   const selectedMeetings = meetingsByCourse[selectedCourseId] || [];
+  const filteredCourse = courses.find((c) => String(c.id) === filterCourseId);
+
+  const filtered = filterCourseId
+    ? events.filter((ev) => String(ev.meeting.course.id) === filterCourseId)
+    : events;
 
   const byDate = (a, b) => a.eventDate.localeCompare(b.eventDate);
 
-  const thisWeek = events
+  const thisWeek = filtered
     .filter((ev) => !isPastDate(ev.eventDate) && isThisWeek(ev.eventDate))
     .sort(byDate);
 
-  const upcoming = events
+  const upcoming = filtered
     .filter((ev) => !isPastDate(ev.eventDate) && !isThisWeek(ev.eventDate))
     .sort(byDate);
 
-  const past = events
+  const past = filtered
     .filter((ev) => isPastDate(ev.eventDate))
     .sort(byDate);
 
@@ -129,8 +147,26 @@ function EventsPage() {
         )}
       </div>
 
+      <div className="filter-row">
+        <label className="filter-label">
+          Showing
+          <select value={filterCourseId} onChange={(e) => setFilterCourseId(e.target.value)}>
+            <option value="">All Courses</option>
+            {courses.map((c) => (
+              <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
+            ))}
+          </select>
+        </label>
+        {filteredCourse && (
+          <span className="filter-active-chip">
+            Filtered to {filteredCourse.code}
+            <button className="filter-clear-btn" onClick={() => setFilterCourseId('')}>×</button>
+          </span>
+        )}
+      </div>
+
       {showForm && (
-        <div className="new-event-panel">
+        <div className="new-event-panel card">
           <label>
             Course
             <select value={selectedCourseId} onChange={(e) => setSelectedCourseId(e.target.value)}>

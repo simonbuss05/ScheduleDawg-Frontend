@@ -22,13 +22,15 @@ function MeetingRow({ meeting, courseId, onDeleteMeeting, onMeetingUpdated }) {
     );
   }
 
+  const label = `${meeting.dayOfWeek} ${formatTime(meeting.startTime)}`;
+
   return (
     <li className="meeting-row">
       <span className="meeting-day">{meeting.dayOfWeek}</span>
       <span>{formatTime(meeting.startTime)} – {formatTime(meeting.endTime)}</span>
       <span>{meeting.building}{meeting.roomNumber ? ` ${meeting.roomNumber}` : ''}</span>
       <button className="btn-secondary" onClick={() => setEditing(true)}>Edit</button>
-      <button className="btn-danger" onClick={() => onDeleteMeeting(meeting.id)}>Delete</button>
+      <button className="btn-danger" onClick={() => onDeleteMeeting(meeting.id, label)}>Delete</button>
     </li>
   );
 }

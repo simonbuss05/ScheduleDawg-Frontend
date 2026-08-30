@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllMeetingsWithCourses, getAllEventsWithDetails } from '../api/scheduleApi';
-import { getMonday, addDays, toDateString, formatDayHeader, formatWeekRange } from '../utils/dateUtils';
+import { getMonday, addDays, toDateString, formatDayHeader, formatWeekRange, isWeekend } from '../utils/dateUtils';
 import { formatTime, formatDuration } from '../utils/time';
 import CourseForm from '../components/CourseForm';
 import EventBadge from '../components/EventBadge';
@@ -59,6 +59,7 @@ function WeeklyPage() {
 
   const weekDates = DAYS.map((_, i) => addDays(weekStart, i));
   const todayStr = toDateString(new Date());
+  const showedUpcomingForWeekend = isWeekend();
 
   const goToPrevWeek = () => setWeekStart(addDays(weekStart, -7));
   const goToNextWeek = () => setWeekStart(addDays(weekStart, 7));
@@ -89,7 +90,11 @@ function WeeklyPage() {
             <button className="btn-secondary" onClick={goToPrevWeek}>&larr;</button>
             <span className="week-range">
               {formatWeekRange(weekStart)}
-              {isCurrentWeek && <span className="current-badge">Current</span>}
+              {isCurrentWeek && (
+                <span className="current-badge">
+                  {showedUpcomingForWeekend ? 'Upcoming' : 'Current'}
+                </span>
+              )}
             </span>
             <button className="btn-secondary" onClick={goToNextWeek}>&rarr;</button>
           </div>
@@ -99,11 +104,11 @@ function WeeklyPage() {
         </div>
       </div>
 
-      {showCourseForm && (
-        <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowCourseForm(false)} />
-      )}
-
       <div className="scroll-region" ref={scrollRef}>
+        {showCourseForm && (
+          <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowCourseForm(false)} />
+        )}
+
         <div className="week-grid">
           <div className="time-column">
             <div className="grid-header-spacer" />

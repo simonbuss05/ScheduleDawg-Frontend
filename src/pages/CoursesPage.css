@@ -89,3 +89,23 @@
 .error {
   color: #BA0C2F;
 }
+
+.btn-danger {
+  background: none;
+  border: 1px solid #BA0C2F;
+  color: #BA0C2F;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #BA0C2F;
+  color: #fff;
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

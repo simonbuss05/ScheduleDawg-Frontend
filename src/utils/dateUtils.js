@@ -2,7 +2,17 @@
 export function getMonday(date) {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
+  // On Saturday (6) or Sunday (0), jump to the UPCOMING Monday instead of
+  // the past one — showing next week's schedule makes more sense on a
+  // weekend than showing the week that's already over.
+  let diff;
+  if (day === 0) {
+    diff = 1; // Sunday -> tomorrow
+  } else if (day === 6) {
+    diff = 2; // Saturday -> the day after tomorrow
+  } else {
+    diff = 1 - day;
+  }
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;
@@ -61,4 +71,9 @@ export function isThisWeek(dateStr) {
   const sunday = addDays(monday, 6);
   sunday.setHours(23, 59, 59, 999);
   return date >= monday && date <= sunday;
+}
+
+export function isWeekend(date = new Date()) {
+  const day = date.getDay();
+  return day === 0 || day === 6;
 }

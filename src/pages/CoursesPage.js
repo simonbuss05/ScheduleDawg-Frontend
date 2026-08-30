@@ -42,11 +42,11 @@ function CoursesPage() {
         )}
       </div>
 
-      {showForm && (
-        <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowForm(false)} />
-      )}
-
       <div className="scroll-region">
+        {showForm && (
+          <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowForm(false)} />
+        )}
+
         {courses.length === 0 ? (
           <p>No courses yet.</p>
         ) : (

@@ -1,3 +1,5 @@
+@import './styles/shared.css';
+
 * {
   box-sizing: border-box;
 }

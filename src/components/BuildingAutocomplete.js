@@ -43,6 +43,10 @@ function BuildingAutocomplete({ value, onChange, placeholder }) {
   };
 
   const handleSelect = (building) => {
+    // The nickname the user typed (`value`) is what actually gets saved
+    // as the meeting's building field — the real building name is only
+    // linked to it for location lookup, never used to overwrite what
+    // the user typed.
     setBuildingOverride(value, { lat: building.lat, lng: building.lng, placeName: building.name });
     setMatched({ lat: building.lat, lng: building.lng, placeName: building.name });
     setShowDropdown(false);
@@ -72,10 +76,12 @@ function BuildingAutocomplete({ value, onChange, placeholder }) {
 
       {loadingBuildings && <span className="building-hint">Loading campus buildings...</span>}
       {!loadingBuildings && matched && (
-        <span className="building-matched-hint">✓ Matched: {matched.placeName}</span>
+        <span className="building-matched-hint">
+          Saved as "<strong>{value}</strong>" — linked to {matched.placeName}
+        </span>
       )}
       {!loadingBuildings && !matched && value.trim().length >= 2 && (
-        <span className="building-hint">Pick a suggestion to lock in this building's location</span>
+        <span className="building-hint">Pick a suggestion below to link this to a real campus location</span>
       )}
     </div>
   );
