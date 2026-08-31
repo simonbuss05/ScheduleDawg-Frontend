@@ -1,5 +1,5 @@
 // src/components/CourseForm.js
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createCourse } from '../api/courseApi';
 import { createMeeting } from '../api/meetingApi';
 import DayPicker from './DayPicker';
@@ -29,6 +29,11 @@ function CourseForm({ onCourseCreated, onCancel }) {
   const [meetingEntries, setMeetingEntries] = useState([newMeetingEntry()]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const errorRef = useRef(null);
+
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [error]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -106,7 +111,7 @@ function CourseForm({ onCourseCreated, onCancel }) {
   return (
     <form className="course-form" onSubmit={handleSubmit}>
       <h3>Add a Course</h3>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error" ref={errorRef}>{error}</p>}
 
       <label>
         Course Name

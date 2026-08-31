@@ -8,7 +8,6 @@ import { getAssignments, deleteAssignment } from '../api/assignmentApi';
 import { getEvents, createEvent, deleteEvent } from '../api/eventApi';
 import { getSyllabiByCourse, getSyllabusFile } from '../api/syllabusApi';
 import { formatDateWithWeekday } from '../utils/dateUtils';
-import { formatTime } from '../utils/time';
 import { getCourseColor } from '../utils/courseColor';
 import { useConfirm } from '../context/ConfirmContext';
 import MeetingForm from '../components/MeetingForm';
@@ -50,28 +49,20 @@ function CourseDetailPage() {
     };
   }, [viewingSyllabus, syllabi]);
 
-  const loadEvents = (meetingList) => {
-    if (meetingList.length === 0) return Promise.resolve([]);
-    return Promise.all(meetingList.map((m) => getEvents(m.id))).then((responses) =>
-      responses.flatMap((res, i) => res.data.map((ev) => ({ ...ev, meeting: meetingList[i] })))
-    );
-  };
-
   useEffect(() => {
     Promise.all([
       getCourseById(courseId),
       getMeetings(courseId),
       getAssignments(courseId),
+      getEvents(courseId),
       getSyllabiByCourse(courseId),
-    ]).then(([courseRes, meetingsRes, assignmentsRes, syllabiRes]) => {
+    ]).then(([courseRes, meetingsRes, assignmentsRes, eventsRes, syllabiRes]) => {
       setCourse(courseRes.data);
       setMeetings(meetingsRes.data);
       setAssignments(assignmentsRes.data);
+      setEvents(eventsRes.data);
       setSyllabi(syllabiRes.data);
-      loadEvents(meetingsRes.data).then((evs) => {
-        setEvents(evs);
-        setLoading(false);
-      });
+      setLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
@@ -83,9 +74,7 @@ function CourseDetailPage() {
     });
     if (!ok) return;
     deleteMeeting(courseId, meetingId).then(() => {
-      const remaining = meetings.filter((m) => m.id !== meetingId);
-      setMeetings(remaining);
-      setEvents(events.filter((ev) => ev.meeting.id !== meetingId));
+      setMeetings(meetings.filter((m) => m.id !== meetingId));
     });
   };
 
@@ -109,8 +98,8 @@ function CourseDetailPage() {
     });
   };
 
-  const handleEventCreated = (event, meeting) => {
-    setEvents([...events, { ...event, meeting }]);
+  const handleEventCreated = (event) => {
+    setEvents([...events, event]);
     setShowEventForm(false);
   };
 
@@ -120,7 +109,7 @@ function CourseDetailPage() {
       message: `"${event.title}" will be removed.`,
     });
     if (!ok) return;
-    deleteEvent(event.meeting.id, event.id).then(() => {
+    deleteEvent(courseId, event.id).then(() => {
       setEvents(events.filter((e) => e.id !== event.id));
     });
   };
@@ -282,20 +271,14 @@ const sortedMeetings = [...meetings].sort(
             <button
               className="btn-primary"
               onClick={() => setShowEventForm(!showEventForm)}
-              disabled={meetings.length === 0}
-              title={meetings.length === 0 ? 'Add a meeting first' : undefined}
             >
               {showEventForm ? 'Cancel' : '+ Add Event'}
             </button>
           </div>
 
-          {meetings.length === 0 && (
-            <p className="empty-state">Add a meeting first — events attach to a class day.</p>
-          )}
-
           {showEventForm && (
             <EventForm
-              meetings={meetings}
+              courseId={courseId}
               createEventFn={createEvent}
               onCreated={handleEventCreated}
               onCancel={() => setShowEventForm(false)}
@@ -303,14 +286,14 @@ const sortedMeetings = [...meetings].sort(
           )}
 
           {sortedEvents.length === 0 ? (
-            meetings.length > 0 && <p className="empty-state">No events yet.</p>
+            <p className="empty-state">No events yet.</p>
           ) : (
             <ul className="hub-list">
               {sortedEvents.map((ev) => (
                 <li key={ev.id} className="hub-list-row">
                   <span className="hub-list-title">{ev.title}</span>
                   <span className="hub-list-date">
-                    {formatDateWithWeekday(ev.eventDate)} · {formatTime(ev.meeting.startTime)}
+                    {formatDateWithWeekday(ev.eventDate)}
                   </span>
                   <button className="icon-btn" onClick={() => handleDeleteEvent(ev)} title="Delete">×</button>
                 </li>

@@ -1,7 +1,7 @@
 // src/pages/WeeklyPage.js
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllMeetingsWithCourses, getAllEventsWithDetails, getAllAssignmentsWithCourses } from '../api/scheduleApi';
+import { getAllMeetingsWithCourses, getAllEventsWithCourses, getAllAssignmentsWithCourses } from '../api/scheduleApi';
 import { getMonday, addDays, toDateString, formatDayHeader, formatWeekRange, isWeekend } from '../utils/dateUtils';
 import { formatTime, formatDuration } from '../utils/time';
 import { getCourseColor } from '../utils/courseColor';
@@ -36,7 +36,7 @@ function WeeklyPage() {
     setLoadError(null);
     getAllMeetingsWithCourses().then((allMeetings) => {
       setMeetings(allMeetings);
-      return Promise.all([getAllEventsWithDetails(allMeetings), getAllAssignmentsWithCourses()]);
+      return Promise.all([getAllEventsWithCourses(), getAllAssignmentsWithCourses()]);
     }).then(([allEvents, allAssignments]) => {
       setEvents(allEvents);
       setAssignments(allAssignments.filter((a) => !a.completed));
@@ -156,12 +156,18 @@ function WeeklyPage() {
                 >
                   {meetings
                     .filter((m) => m.dayOfWeek === day)
-                    .map((m) => {
+                    .map((m, idx, dayMeetings) => {
                       const top = timeToMinutesFromStart(m.startTime) * (HOUR_HEIGHT / 60);
                       const height =
                         (timeToMinutesFromStart(m.endTime) - timeToMinutesFromStart(m.startTime)) *
                         (HOUR_HEIGHT / 60);
-                      const eventsForMeeting = dayEvents.filter((ev) => ev.meeting.id === m.id);
+                      // Events belong to the course, not a specific meeting slot. If a course
+                      // meets more than once on this day, show its events on the first block only.
+                      const isFirstMeetingForCourseToday =
+                        dayMeetings.find((dm) => dm.course.id === m.course.id) === m;
+                      const eventsForMeeting = isFirstMeetingForCourseToday
+                        ? dayEvents.filter((ev) => ev.course.id === m.course.id)
+                        : [];
                       const locationText = m.building
                         ? `${m.building}${m.roomNumber ? ` ${m.roomNumber}` : ''}`
                         : '';

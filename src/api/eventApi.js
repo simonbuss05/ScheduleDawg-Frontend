@@ -1,7 +1,7 @@
 // src/api/eventApi.js
 import api from './axiosConfig';
 
-export const getEvents = (meetingId) => api.get(`/meetings/${meetingId}/events`);
-export const createEvent = (meetingId, data) => api.post(`/meetings/${meetingId}/events`, data);
-export const deleteEvent = (meetingId, eventId) =>
-  api.delete(`/meetings/${meetingId}/events/${eventId}`);
+export const getEvents = (courseId) => api.get(`/courses/${courseId}/events`);
+export const createEvent = (courseId, data) => api.post(`/courses/${courseId}/events`, data);
+export const deleteEvent = (courseId, eventId) =>
+  api.delete(`/courses/${courseId}/events/${eventId}`);

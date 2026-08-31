@@ -26,12 +26,15 @@ export const getAllAssignmentsWithCourses = () => {
   });
 };
 
-export const getAllEventsWithDetails = (meetings) => {
-  if (meetings.length === 0) return Promise.resolve([]);
-  return Promise.all(meetings.map((m) => getEvents(m.id))).then((eventResponses) => {
-    return eventResponses.flatMap((res, i) =>
-      res.data.map((event) => ({ ...event, meeting: meetings[i] }))
-    );
+export const getAllEventsWithCourses = () => {
+  return getCourses().then((coursesRes) => {
+    const courses = coursesRes.data;
+    if (courses.length === 0) return [];
+    return Promise.all(courses.map((course) => getEvents(course.id))).then((responses) => {
+      return responses.flatMap((res, i) =>
+        res.data.map((event) => ({ ...event, course: courses[i] }))
+      );
+    });
   });
 };
 
@@ -56,23 +59,11 @@ export const getCoursesWithSummaries = () => {
 };
 
 export const getDaySchedule = () => {
-  return getCourses().then((coursesRes) => {
-    const courses = coursesRes.data;
-    return Promise.all(courses.map((c) => getMeetings(c.id))).then((meetingResponses) => {
-      const allMeetings = meetingResponses.flatMap((res, i) =>
-        res.data.map((m) => ({ ...m, course: courses[i] }))
-      );
-      return Promise.all([
-        Promise.resolve(allMeetings),
-        Promise.all(courses.map((c) => getAssignments(c.id))).then((r) =>
-          r.flatMap((res, i) => res.data.map((a) => ({ ...a, course: courses[i] })))
-        ),
-        Promise.all(allMeetings.map((m) => getEvents(m.id))).then((r) =>
-          r.flatMap((res, i) => res.data.map((ev) => ({ ...ev, meeting: allMeetings[i] })))
-        ),
-      ]);
-    });
-  }).then(([allMeetings, allAssignments, allEvents]) => ({
+  return Promise.all([
+    getAllMeetingsWithCourses(),
+    getAllAssignmentsWithCourses(),
+    getAllEventsWithCourses(),
+  ]).then(([allMeetings, allAssignments, allEvents]) => ({
     allMeetings,
     allAssignments,
     allEvents,

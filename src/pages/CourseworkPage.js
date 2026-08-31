@@ -3,11 +3,9 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getCourses } from '../api/courseApi';
 import { getSemesters } from '../api/semesterApi';
-import { getMeetings } from '../api/meetingApi';
 import { getAssignments, updateAssignment, deleteAssignment } from '../api/assignmentApi';
 import { getEvents, createEvent, deleteEvent } from '../api/eventApi';
 import { formatDateWithWeekday, isPastDate, isThisWeek } from '../utils/dateUtils';
-import { formatTime } from '../utils/time';
 import { getCourseColor } from '../utils/courseColor';
 import { useConfirm } from '../context/ConfirmContext';
 import AssignmentForm from '../components/AssignmentForm';
@@ -20,7 +18,6 @@ function CourseworkPage() {
   const semesterId = searchParams.get('semesterId');
 
   const [courses, setCourses] = useState([]);
-  const [meetingsByCourse, setMeetingsByCourse] = useState({});
   const [assignments, setAssignments] = useState([]);
   const [events, setEvents] = useState([]);
   const [viewingSemester, setViewingSemester] = useState(null);
@@ -48,32 +45,20 @@ function CourseworkPage() {
           setViewingSemester(null);
         }
 
-        return Promise.all(courseList.map((c) => getMeetings(c.id))).then((meetingResponses) => {
-          const meetingMap = {};
-          courseList.forEach((c, i) => {
-            meetingMap[c.id] = meetingResponses[i].data;
-          });
-          setMeetingsByCourse(meetingMap);
-
-          const allMeetings = meetingResponses.flatMap((res, i) =>
-            res.data.map((m) => ({ ...m, course: courseList[i] }))
+        return Promise.all([
+          Promise.all(courseList.map((c) => getAssignments(c.id))),
+          Promise.all(courseList.map((c) => getEvents(c.id))),
+        ]).then(([assignmentResponses, eventResponses]) => {
+          setAssignments(
+            assignmentResponses.flatMap((res, i) =>
+              res.data.map((a) => ({ ...a, course: courseList[i] }))
+            )
           );
-
-          return Promise.all([
-            Promise.all(courseList.map((c) => getAssignments(c.id))),
-            Promise.all(allMeetings.map((m) => getEvents(m.id))),
-          ]).then(([assignmentResponses, eventResponses]) => {
-            setAssignments(
-              assignmentResponses.flatMap((res, i) =>
-                res.data.map((a) => ({ ...a, course: courseList[i] }))
-              )
-            );
-            setEvents(
-              eventResponses.flatMap((res, i) =>
-                res.data.map((ev) => ({ ...ev, meeting: allMeetings[i] }))
-              )
-            );
-          });
+          setEvents(
+            eventResponses.flatMap((res, i) =>
+              res.data.map((ev) => ({ ...ev, course: courseList[i] }))
+            )
+          );
         });
       })
       .catch(() => setLoadError('Could not load your coursework. Is the backend running?'))
@@ -106,7 +91,7 @@ function CourseworkPage() {
         setAssignments(assignments.filter((a) => a.id !== item.raw.id));
       });
     } else {
-      deleteEvent(item.raw.meeting.id, item.raw.id).then(() => {
+      deleteEvent(item.course.id, item.raw.id).then(() => {
         setEvents(events.filter((e) => e.id !== item.raw.id));
       });
     }
@@ -127,7 +112,7 @@ function CourseworkPage() {
   if (loading) return <p>Loading coursework...</p>;
 
   const selectedAssignmentCourse = courses.find((c) => String(c.id) === assignmentCourseId);
-  const eventCourseMeetings = meetingsByCourse[eventCourseId] || [];
+  const selectedEventCourse = courses.find((c) => String(c.id) === eventCourseId);
   const filteredCourse = courses.find((c) => String(c.id) === filterCourseId);
 
   const items = [
@@ -144,10 +129,9 @@ function CourseworkPage() {
       type: 'event',
       id: `e-${ev.id}`,
       raw: ev,
-      course: ev.meeting.course,
+      course: ev.course,
       title: ev.title,
       date: ev.eventDate,
-      time: ev.meeting.startTime,
     })),
   ];
 
@@ -193,7 +177,6 @@ function CourseworkPage() {
       </span>
       <span className="coursework-date">
         {formatDateWithWeekday(item.date)}
-        {item.type === 'event' && ` · ${formatTime(item.time)}`}
       </span>
       <button className="btn-danger" onClick={() => handleDelete(item)}>Delete</button>
     </li>
@@ -316,15 +299,9 @@ function CourseworkPage() {
               ))}
             </select>
           </label>
-          {eventCourseId && eventCourseMeetings.length === 0 && (
-            <p className="empty-state">
-              This course has no meetings yet — events attach to a class day.
-            </p>
-          )}
-
-          {eventCourseId && eventCourseMeetings.length > 0 && (
+          {selectedEventCourse && (
             <EventForm
-              meetings={eventCourseMeetings}
+              courseId={selectedEventCourse.id}
               createEventFn={createEvent}
               onCreated={handleEventCreated}
               onCancel={() => setShowEventForm(false)}

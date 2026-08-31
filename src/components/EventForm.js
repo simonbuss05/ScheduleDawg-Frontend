@@ -1,8 +1,6 @@
 // src/components/EventForm.js
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './EventForm.css';
-
-const DAY_NAMES = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
 function getTodayString() {
   const today = new Date();
@@ -12,7 +10,7 @@ function getTodayString() {
   return `${year}-${month}-${day}`;
 }
 
-function EventForm({ meetings, onCreated, onCancel, createEventFn }) {
+function EventForm({ courseId, onCreated, onCancel, createEventFn }) {
   const todayString = getTodayString();
 
   const [form, setForm] = useState({
@@ -22,6 +20,11 @@ function EventForm({ meetings, onCreated, onCancel, createEventFn }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const errorRef = useRef(null);
+
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [error]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,31 +39,20 @@ function EventForm({ meetings, onCreated, onCancel, createEventFn }) {
       return;
     }
 
-    const [year, month, day] = form.eventDate.split('-').map(Number);
-    const selectedDate = new Date(year, month - 1, day);
-    const weekday = DAY_NAMES[selectedDate.getDay()];
-
-    const matchingMeeting = meetings.find((m) => m.dayOfWeek === weekday);
-
-    if (!matchingMeeting) {
-      setError(`This course doesn't meet on a ${weekday.toLowerCase()}.`);
-      return;
-    }
-
     setSubmitting(true);
-    createEventFn(matchingMeeting.id, {
+    createEventFn(courseId, {
       title: form.title,
       description: form.description,
       eventDate: form.eventDate,
     })
-      .then((res) => onCreated(res.data, matchingMeeting))
+      .then((res) => onCreated(res.data))
       .catch(() => setError('Could not add event. Try again.'))
       .finally(() => setSubmitting(false));
   };
 
   return (
     <form className="event-form" onSubmit={handleSubmit}>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error" ref={errorRef}>{error}</p>}
 
       <label>
         Title

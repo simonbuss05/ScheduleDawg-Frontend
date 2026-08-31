@@ -99,7 +99,7 @@ function HomePage() {
     () =>
       allEvents
         .filter((ev) => ev.eventDate === dateStr)
-        .sort((a, b) => timeToMinutes(a.meeting.startTime) - timeToMinutes(b.meeting.startTime)),
+        .sort((a, b) => a.title.localeCompare(b.title)),
     [allEvents, dateStr]
   );
 
@@ -319,10 +319,9 @@ function HomePage() {
                 <ul className="mini-list">
                   {todaysEvents.map((ev) => (
                     <li key={ev.id} className="mini-list-row">
-                      <span className="mini-time">{formatTime(ev.meeting.startTime)}</span>
                       <div className="mini-course-info">
                         <span className="mini-title">{ev.title}</span>
-                        <span className="mini-course-sub">{ev.meeting.course.name}</span>
+                        <span className="mini-course-sub">{ev.course.name}</span>
                       </div>
                     </li>
                   ))}

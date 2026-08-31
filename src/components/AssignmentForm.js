@@ -1,5 +1,5 @@
 // src/components/AssignmentForm.js
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createAssignment } from '../api/assignmentApi';
 import './AssignmentForm.css';
 
@@ -21,6 +21,11 @@ function AssignmentForm({ courseId, onCreated, onCancel }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const errorRef = useRef(null);
+
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [error]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,7 +50,7 @@ function AssignmentForm({ courseId, onCreated, onCancel }) {
 
   return (
     <form className="assignment-form" onSubmit={handleSubmit}>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error" ref={errorRef}>{error}</p>}
 
       <label>
         Title

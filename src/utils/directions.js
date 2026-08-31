@@ -1,7 +1,13 @@
 // src/utils/directions.js
+import { legKey, getCachedLeg, setCachedLeg } from './directionsCache';
+
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
 export async function getWalkingLeg(from, to) {
+  const key = legKey(from, to);
+  const cached = getCachedLeg(key);
+  if (cached) return cached;
+
   const coordString = `${from.lng},${from.lat};${to.lng},${to.lat}`;
   const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${coordString}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
 
@@ -16,9 +22,11 @@ export async function getWalkingLeg(from, to) {
   }
 
   const route = data.routes[0];
-  return {
+  const leg = {
     distanceMeters: route.distance,
     durationSeconds: route.duration,
     geometry: route.geometry,
   };
+  setCachedLeg(key, leg);
+  return leg;
 }
