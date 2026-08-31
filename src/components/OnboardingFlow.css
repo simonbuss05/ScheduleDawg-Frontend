@@ -1,0 +1,85 @@
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 19, 19, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.onboarding-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-progress {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+}
+
+.onboarding-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--color-text);
+  margin: 0 0 12px;
+}
+
+.onboarding-step-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0 0 10px;
+}
+
+.onboarding-body {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.onboarding-list {
+  margin: 0 0 20px;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.onboarding-list li + li {
+  margin-top: 8px;
+}
+
+.onboarding-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.onboarding-actions .btn-primary {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.onboarding-card .course-form {
+  margin-bottom: 0;
+  max-width: none;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}

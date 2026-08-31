@@ -10,8 +10,67 @@ mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const HOME_ICON_SVG = renderToStaticMarkup(<Home size={14} color="#fff" strokeWidth={2.5} />);
 
+// Every leg is shifted this many meters to the "right" of its own direction of
+// travel. Two legs that retrace the exact same street in opposite directions
+// (the extremely common home -> class -> home case) end up on opposite sides
+// of the centerline instead of drawing on top of each other, because "right
+// of travel" flips to the opposite physical side when the direction reverses.
+const ROUTE_OFFSET_METERS = 4;
+const ARROW_ICON_ID = 'daily-map-walk-arrow';
+
 function stopKey(stop) {
   return `${stop.lat.toFixed(6)},${stop.lng.toFixed(6)}`;
+}
+
+function metersPerDegreeAt(lat) {
+  const latRad = (lat * Math.PI) / 180;
+  return {
+    lat: 111320,
+    lng: 111320 * Math.cos(latRad),
+  };
+}
+
+// Shifts a lng/lat polyline perpendicular to its own local direction by a
+// fixed real-world distance, so the offset stays visually consistent across
+// zoom levels and both the line and its direction arrows can share one
+// geometry (rather than approximating the shift separately for each).
+function offsetLineCoordinates(coordinates, offsetMeters) {
+  if (coordinates.length < 2 || !offsetMeters) return coordinates;
+
+  return coordinates.map((coord, i) => {
+    const [lng, lat] = coord;
+    const prev = coordinates[Math.max(0, i - 1)];
+    const next = coordinates[Math.min(coordinates.length - 1, i + 1)];
+    const scale = metersPerDegreeAt(lat);
+
+    const dx = (next[0] - prev[0]) * scale.lng;
+    const dy = (next[1] - prev[1]) * scale.lat;
+    const len = Math.hypot(dx, dy) || 1;
+
+    // Rotate the local tangent 90° clockwise to get "right of travel".
+    const perpXMeters = dy / len;
+    const perpYMeters = -dx / len;
+
+    return [
+      lng + (perpXMeters * offsetMeters) / scale.lng,
+      lat + (perpYMeters * offsetMeters) / scale.lat,
+    ];
+  });
+}
+
+function createArrowIcon(size = 24) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.beginPath();
+  ctx.moveTo(size * 0.16, size * 0.14);
+  ctx.lineTo(size * 0.88, size * 0.5);
+  ctx.lineTo(size * 0.16, size * 0.86);
+  ctx.closePath();
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  return ctx.getImageData(0, 0, size, size);
 }
 
 function DailyMap({ stops, legs, legColors }) {
@@ -36,14 +95,26 @@ function DailyMap({ stops, legs, legColors }) {
     });
 
     map.on('load', () => {
+      if (!map.hasImage(ARROW_ICON_ID)) {
+        map.addImage(ARROW_ICON_ID, createArrowIcon(), { sdf: true });
+      }
+
       legs.forEach((leg, i) => {
         const sourceId = `route-leg-${i}`;
         const color = legColors[i % legColors.length];
-        const offset = (i % 2 === 0 ? 1 : -1) * (4 + Math.floor(i / 2) * 3);
+        const offsetCoordinates = offsetLineCoordinates(
+          leg.geometry.coordinates,
+          ROUTE_OFFSET_METERS
+        );
+        const routeLength = leg.geometry.coordinates.length;
 
         map.addSource(sourceId, {
           type: 'geojson',
-          data: { type: 'Feature', properties: {}, geometry: leg.geometry },
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: { type: 'LineString', coordinates: offsetCoordinates },
+          },
         });
 
         map.addLayer({
@@ -53,29 +124,31 @@ function DailyMap({ stops, legs, legColors }) {
           layout: { 'line-join': 'round', 'line-cap': 'round' },
           paint: {
             'line-color': color,
-            'line-width': 6,
-            'line-offset': offset,
+            'line-width': 5,
           },
         });
 
+        // Repeat small direction arrows along the route rather than a single
+        // centered glyph — one arrow can land under a marker or run out of
+        // room to render; several spaced-out ones read as "flow direction"
+        // and always show at least one somewhere along the leg.
         map.addLayer({
           id: `${sourceId}-arrow`,
           type: 'symbol',
           source: sourceId,
           layout: {
-            'symbol-placement': 'line-center',
-            'text-field': '➤',
-            'text-size': 20,
-            'text-keep-upright': false,
-            'text-rotation-alignment': 'map',
-            'text-offset': [0, offset / 12],
-            'text-allow-overlap': true,
-            'text-ignore-placement': true,
+            'symbol-placement': 'line',
+            'symbol-spacing': Math.max(30, Math.min(90, routeLength)),
+            'icon-image': ARROW_ICON_ID,
+            'icon-size': 0.7,
+            'icon-rotation-alignment': 'map',
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
           },
           paint: {
-            'text-color': '#1a1a1a',
-            'text-halo-color': '#ffffff',
-            'text-halo-width': 2.5,
+            'icon-color': color,
+            'icon-halo-color': '#ffffff',
+            'icon-halo-width': 1.5,
           },
         });
 

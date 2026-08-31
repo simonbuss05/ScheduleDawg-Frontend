@@ -1,54 +1,48 @@
-.page-header {
+.page-shell {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page-header {
   margin-bottom: 24px;
 }
 
-.page-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
-  color: #131313;
-  margin: 0;
+.scroll-region {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .settings-section {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 20px;
   max-width: 460px;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 
 .settings-section h3 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
   margin: 0 0 6px;
 }
 
 .settings-description {
   font-size: 13px;
-  color: #4B5563;
+  color: var(--color-text-muted);
   margin: 0 0 16px;
 }
 
 .settings-form label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #4B5563;
   margin-bottom: 12px;
-}
-
-.settings-form input {
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 4px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  box-sizing: border-box;
 }
 
 .address-row {
@@ -58,13 +52,12 @@
 }
 
 .error {
-  color: #BA0C2F;
   font-size: 13px;
   margin: 0 0 12px;
 }
 
 .success {
-  color: #16a34a;
+  color: var(--color-success);
   font-size: 13px;
   margin: 0 0 12px;
 }
@@ -72,7 +65,7 @@
 .resolved-address {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -83,11 +76,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: #4B5563;
+  color: var(--color-text-muted);
 }
 
 .resolved-address-value {
   font-size: 14px;
   font-weight: 600;
-  color: #131313;
+  color: var(--color-text);
 }

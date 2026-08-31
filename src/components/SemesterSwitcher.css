@@ -1,0 +1,145 @@
+.semester-switcher {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.semester-switcher-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  background: #1f1f1f;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  color: #d1d1d1;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.semester-switcher-button:hover {
+  background: #262626;
+}
+
+.semester-switcher-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.semester-switcher-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: 10px;
+  z-index: 80;
+  color: var(--color-text);
+}
+
+.semester-switcher-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.semester-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.semester-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.semester-list-row.is-active {
+  background: var(--color-bg);
+}
+
+.semester-list-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.semester-current-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.semester-list-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.semester-list-actions button {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.semester-list-actions button:hover {
+  text-decoration: underline;
+}
+
+.semester-end-btn {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.semester-end-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.semester-new-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.semester-new-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

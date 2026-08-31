@@ -5,18 +5,7 @@
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 24px;
-  flex-shrink: 0;
-}
-
-.page-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
-  color: #131313;
-  margin: 0;
 }
 
 .nav-bar {
@@ -180,26 +169,35 @@
   position: absolute;
   left: 4px;
   right: 4px;
-  background: #BA0C2F;
+  background: var(--course-color, var(--color-primary));
   color: #fff;
-  border-radius: 4px;
-  padding: 5px 6px;
+  border-radius: 6px;
+  padding: 4px 6px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 1px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.meeting-block:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
 }
 
 .meeting-block-name {
   color: #fff;
   text-decoration: none;
   font-weight: 700;
-  font-size: 11px;
-  line-height: 1.2;
+  font-size: 10px;
+  line-height: 1.15;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .meeting-block-name:hover {
@@ -207,10 +205,23 @@
 }
 
 .meeting-block-sub {
-  opacity: 0.85;
-  font-size: 9px;
-  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 8px;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+@media (max-width: 860px) {
+  .scroll-region {
+    overflow-x: auto;
+  }
+
+  .week-grid {
+    grid-template-columns: 50px repeat(5, 140px);
+    width: fit-content;
+    min-width: 100%;
+  }
 }

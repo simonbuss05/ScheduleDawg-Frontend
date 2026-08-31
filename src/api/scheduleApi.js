@@ -15,6 +15,17 @@ export const getAllMeetingsWithCourses = () => {
   });
 };
 
+export const getAllAssignmentsWithCourses = () => {
+  return getCourses().then((coursesRes) => {
+    const courses = coursesRes.data;
+    return Promise.all(courses.map((course) => getAssignments(course.id))).then((responses) => {
+      return responses.flatMap((res, i) =>
+        res.data.map((assignment) => ({ ...assignment, course: courses[i] }))
+      );
+    });
+  });
+};
+
 export const getAllEventsWithDetails = (meetings) => {
   if (meetings.length === 0) return Promise.resolve([]);
   return Promise.all(meetings.map((m) => getEvents(m.id))).then((eventResponses) => {

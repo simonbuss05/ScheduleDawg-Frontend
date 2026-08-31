@@ -9,18 +9,18 @@
   border: 1px solid #ddd;
   border-radius: 20px;
   background: #fff;
-  color: #4B5563;
+  color: var(--color-text-muted);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .day-chip:hover {
-  border-color: #BA0C2F;
+  border-color: var(--color-primary);
 }
 
 .day-chip.active {
-  background: #BA0C2F;
-  border-color: #BA0C2F;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: #fff;
 }

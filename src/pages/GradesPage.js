@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getCourses } from '../api/courseApi';
+import { getSemesters } from '../api/semesterApi';
 import { getGradeCategories, createGradeCategory, updateGradeCategory } from '../api/gradeCategoryApi';
 import { getGradeScale, createGradeScaleEntry, deleteGradeScaleEntry } from '../api/gradeScaleApi';
 import { getSyllabiByCourse } from '../api/syllabusApi';
@@ -12,6 +13,7 @@ import {
   getGradeColor,
 } from '../utils/gradeCalculator';
 import { useConfirm } from '../context/ConfirmContext';
+import { getCourseColor } from '../utils/courseColor';
 import CategoryCard from '../components/CategoryCard';
 import CourseGradeSummary from '../components/CourseGradeSummary';
 import './GradesPage.css';
@@ -19,14 +21,17 @@ import './GradesPage.css';
 function GradesPage() {
   const confirm = useConfirm();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const semesterId = searchParams.get('semesterId');
 
   const [courses, setCourses] = useState([]);
+  const [viewingSemester, setViewingSemester] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [categories, setCategories] = useState([]);
   const [scale, setScale] = useState([]);
   const [itemsByCategoryId, setItemsByCategoryId] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [loadingCourseData, setLoadingCourseData] = useState(false);
   const [courseHasSyllabus, setCourseHasSyllabus] = useState({});
 
@@ -44,30 +49,44 @@ function GradesPage() {
   const [targetResult, setTargetResult] = useState(null);
   const [targetError, setTargetError] = useState(null);
 
-  useEffect(() => {
-    getCourses()
-      .then((res) => {
-        setCourses(res.data);
+  const loadCourses = () => {
+    setLoading(true);
+    setLoadError(null);
+    Promise.all([getCourses(semesterId), getSemesters()])
+      .then(([coursesRes, semestersRes]) => {
+        setCourses(coursesRes.data);
+        if (semesterId) {
+          const match = semestersRes.data.find((s) => String(s.id) === semesterId);
+          setViewingSemester(match && !match.active ? match : null);
+        } else {
+          setViewingSemester(null);
+        }
         const preselectId = searchParams.get('courseId');
         if (preselectId) {
-          const match = res.data.find((c) => String(c.id) === preselectId);
+          const match = coursesRes.data.find((c) => String(c.id) === preselectId);
           if (match) handleSelectCourse(match);
         }
       })
+      .catch(() => setLoadError('Could not load courses. Is the backend running?'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadCourses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [semesterId]);
 
   const loadCourseData = (courseId) => {
     setLoadingCourseData(true);
-    Promise.all([getGradeCategories(courseId), getGradeScale(courseId)]).then(
-      ([catRes, scaleRes]) => {
+    setLoadError(null);
+    Promise.all([getGradeCategories(courseId), getGradeScale(courseId)])
+      .then(([catRes, scaleRes]) => {
         setCategories(catRes.data);
         setScale(scaleRes.data);
         setItemsByCategoryId({});
-        setLoadingCourseData(false);
-      }
-    );
+      })
+      .catch(() => setLoadError('Could not load this course\'s grades. Is the backend running?'))
+      .finally(() => setLoadingCourseData(false));
     getSyllabiByCourse(courseId).then((res) => {
       setCourseHasSyllabus((prev) => ({ ...prev, [courseId]: res.data.length > 0 }));
     });
@@ -231,6 +250,25 @@ function GradesPage() {
         <h2 className="page-title">Grades</h2>
       </div>
 
+      {loadError && (
+        <div className="load-error-banner">
+          <span>{loadError}</span>
+          <button
+            className="btn-secondary"
+            onClick={() => (selectedCourse ? loadCourseData(selectedCourse.id) : loadCourses())}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {viewingSemester && !selectedCourse && (
+        <div className="archived-semester-banner">
+          <span>Viewing an archived semester: <strong>{viewingSemester.name}</strong></span>
+          <button className="btn-secondary" onClick={() => setSearchParams({})}>Back to current semester</button>
+        </div>
+      )}
+
       <div className="scroll-region">
         {!selectedCourse ? (
           courses.length === 0 ? (
@@ -241,6 +279,7 @@ function GradesPage() {
                 <button
                   key={c.id}
                   className="course-summary-card"
+                  style={{ '--course-color': getCourseColor(c.id) }}
                   onClick={() => handleSelectCourse(c)}
                 >
                   <div className="course-summary-top">
@@ -249,7 +288,7 @@ function GradesPage() {
                   </div>
                   <span className="course-summary-code">{c.code}</span>
                   <div className="grade-summary-body">
-                    <CourseGradeSummary courseId={c.id} />
+                    <CourseGradeSummary courseId={c.id} onColor />
                   </div>
                 </button>
               ))}
@@ -258,7 +297,7 @@ function GradesPage() {
         ) : loadingCourseData ? (
           <p className="empty-state">Loading course data...</p>
         ) : (
-          <>
+          <div style={{ '--course-color': getCourseColor(selectedCourse.id) }}>
             <button className="back-link" onClick={handleBackToAll}>
               &larr; All Courses
             </button>
@@ -432,7 +471,7 @@ function GradesPage() {
                 )}
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

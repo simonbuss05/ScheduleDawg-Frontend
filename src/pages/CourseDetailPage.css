@@ -32,7 +32,8 @@
 }
 
 .course-header h2 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 26px;
   color: var(--color-text);
   margin: 0 0 2px;
@@ -54,11 +55,13 @@
 .hub-stat-card {
   background: #fff;
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--course-color, var(--color-primary));
   border-radius: var(--radius);
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  box-shadow: var(--shadow-sm);
 }
 
 .hub-stat-header {
@@ -162,7 +165,7 @@
 
 .meeting-day {
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--course-color, var(--color-primary));
   width: 80px;
 }
 
@@ -208,4 +211,20 @@
   flex: 1;
   border: none;
   width: 100%;
+}
+
+@media (max-width: 860px) {
+  .course-header {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .hub-stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .meeting-row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
 }

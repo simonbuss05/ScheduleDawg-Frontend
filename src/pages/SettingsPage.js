@@ -1,7 +1,9 @@
 // src/pages/SettingsPage.js
 import { useEffect, useState } from 'react';
 import { getSettings, updateSettings } from '../api/settingsApi';
+import { changePassword } from '../api/authApi';
 import { geocodeAddress } from '../utils/geocoding';
+import { useAuth } from '../context/AuthContext';
 import './SettingsPage.css';
 
 function combineAddress({ street, city, state, zip }) {
@@ -9,6 +11,7 @@ function combineAddress({ street, city, state, zip }) {
 }
 
 function SettingsPage() {
+  const { user } = useAuth();
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -18,6 +21,13 @@ function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     getSettings().then((res) => {
@@ -59,6 +69,32 @@ function SettingsPage() {
       .finally(() => setSaving(false));
   };
 
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(false);
+
+    if (newPassword.length < 8) {
+      setPasswordError('New password must be at least 8 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+
+    setChangingPassword(true);
+    changePassword(currentPassword, newPassword)
+      .then(() => {
+        setPasswordSuccess(true);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      })
+      .catch((err) => setPasswordError(err.response?.data?.message || 'Could not change your password.'))
+      .finally(() => setChangingPassword(false));
+  };
+
   if (loading) return <p>Loading settings...</p>;
 
   return (
@@ -67,64 +103,114 @@ function SettingsPage() {
         <h2 className="page-title">Settings</h2>
       </div>
 
-      <div className="settings-section">
-        <h3>Home Address</h3>
-        <p className="settings-description">
-          Used to calculate walking directions to and from your first and last class of the day.
-        </p>
+      <div className="scroll-region">
+        <div className="settings-section">
+          <h3>Home Address</h3>
+          <p className="settings-description">
+            Used to calculate walking directions to and from your first and last class of the day.
+          </p>
 
-        <form className="settings-form" onSubmit={handleSubmit}>
-          {error && <p className="error">{error}</p>}
-          {success && <p className="success">Address saved.</p>}
+          <form className="settings-form" onSubmit={handleSubmit}>
+            {error && <p className="error">{error}</p>}
+            {success && <p className="success">Address saved.</p>}
 
-          <label>
-            Street Address
-            <input
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-              placeholder="123 Main St"
-            />
-          </label>
-
-          <div className="address-row">
-            <label className="city-field">
-              City
+            <label>
+              Street Address
               <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Athens"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="123 Main St"
               />
             </label>
-            <label className="state-field">
-              State
+
+            <div className="address-row">
+              <label className="city-field">
+                City
+                <input
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Athens"
+                />
+              </label>
+              <label className="state-field">
+                State
+                <input
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  placeholder="GA"
+                  maxLength={2}
+                />
+              </label>
+              <label className="zip-field">
+                Zip Code
+                <input
+                  value={zip}
+                  onChange={(e) => setZip(e.target.value)}
+                  placeholder="30601"
+                />
+              </label>
+            </div>
+
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving ? 'Saving...' : resolvedAddress ? 'Update Address' : 'Save Address'}
+            </button>
+          </form>
+
+          {resolvedAddress && (
+            <div className="resolved-address">
+              <span className="resolved-address-label">Matched location:</span>
+              <span className="resolved-address-value">{resolvedAddress}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="settings-section">
+          <h3>Account</h3>
+          {user?.email && (
+            <p className="settings-description">
+              Signed in as <strong>{user.email}</strong>.
+            </p>
+          )}
+
+          <form className="settings-form" onSubmit={handleChangePassword}>
+            {passwordError && <p className="error">{passwordError}</p>}
+            {passwordSuccess && <p className="success">Password updated.</p>}
+
+            <label>
+              Current Password
               <input
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                placeholder="GA"
-                maxLength={2}
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
               />
             </label>
-            <label className="zip-field">
-              Zip Code
+            <label>
+              New Password
               <input
-                value={zip}
-                onChange={(e) => setZip(e.target.value)}
-                placeholder="30601"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                minLength={8}
+                required
               />
             </label>
-          </div>
+            <label>
+              Confirm New Password
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                minLength={8}
+                required
+              />
+            </label>
 
-          <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? 'Saving...' : resolvedAddress ? 'Update Address' : 'Save Address'}
-          </button>
-        </form>
-
-        {resolvedAddress && (
-          <div className="resolved-address">
-            <span className="resolved-address-label">Matched location:</span>
-            <span className="resolved-address-value">{resolvedAddress}</span>
-          </div>
-        )}
+            <button type="submit" className="btn-primary" disabled={changingPassword}>
+              {changingPassword ? 'Updating...' : 'Change Password'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

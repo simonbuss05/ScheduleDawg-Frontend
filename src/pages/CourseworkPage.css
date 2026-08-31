@@ -1,0 +1,253 @@
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.coursework-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.archived-semester-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.new-coursework-panel {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  max-width: 420px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.new-coursework-panel > label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.scroll-region {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin: 24px 0 10px;
+}
+
+.section-label:first-of-type {
+  margin-top: 8px;
+}
+
+.coursework-table {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.coursework-table-header,
+.coursework-row {
+  display: grid;
+  grid-template-columns: 28px 170px 1fr 150px 70px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+}
+
+.coursework-table-header {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-text-muted);
+}
+
+.coursework-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.coursework-row {
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.coursework-row:last-child {
+  border-bottom: none;
+}
+
+.coursework-row input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.coursework-event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFC72C;
+  justify-self: center;
+}
+
+.coursework-row.done {
+  opacity: 0.55;
+}
+
+.coursework-row.done .coursework-title {
+  text-decoration: line-through;
+}
+
+.coursework-row.overdue .coursework-date {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.cell-course {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-left: 3px solid var(--course-color, var(--color-primary));
+  padding-left: 8px;
+  text-decoration: none;
+}
+
+.cell-course-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cell-course-code {
+  font-size: 11px;
+  color: var(--course-color, var(--color-primary));
+  font-weight: 700;
+}
+
+.coursework-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.coursework-type-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.coursework-type-tag.assignment {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+.coursework-type-tag.event {
+  background: #FFF6DC;
+  color: #92660A;
+}
+
+.coursework-date {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.table-empty-state {
+  padding: 16px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.filter-label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.filter-label select {
+  margin-top: 4px;
+  min-width: 220px;
+}
+
+.filter-active-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #F5E6E8;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 6px 5px 12px;
+  border-radius: 20px;
+  margin-top: 18px;
+}
+
+.filter-clear-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+@media (max-width: 860px) {
+  .coursework-table {
+    overflow-x: auto;
+  }
+
+  .coursework-table-header,
+  .coursework-row {
+    width: fit-content;
+    min-width: 100%;
+  }
+}

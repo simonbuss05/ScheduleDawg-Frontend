@@ -5,24 +5,27 @@
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 24px;
-  flex-shrink: 0;
-}
-
-.page-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
-  color: #131313;
-  margin: 0;
 }
 
 .scroll-region {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+}
+
+.archived-semester-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
 }
 
 .course-grid {
@@ -32,20 +35,19 @@
 }
 
 .course-card {
-  background: #fff;
-  border: 1px solid #eee;
-  border-left: 4px solid #BA0C2F;
+  background: var(--course-color, var(--color-primary));
   border-radius: 10px;
   padding: 18px;
   text-decoration: none;
-  color: inherit;
+  color: #fff;
   display: block;
+  box-shadow: var(--shadow-sm);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .course-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-hover);
 }
 
 .course-card-top {
@@ -55,57 +57,34 @@
 }
 
 .course-card h3 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 19px;
-  color: #131313;
+  color: #fff;
   margin: 0;
 }
 
 .course-card-chevron {
   font-size: 22px;
-  color: #ccc;
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 700;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .course-card:hover .course-card-chevron {
-  color: #BA0C2F;
+  color: #fff;
   transform: translateX(2px);
 }
 
 .course-code-sub {
   font-size: 12px;
   font-weight: 700;
-  color: #BA0C2F;
+  color: rgba(255, 255, 255, 0.9);
   margin: 4px 0 6px;
 }
 
 .course-professor {
   font-size: 14px;
-  color: #4B5563;
+  color: rgba(255, 255, 255, 0.85);
   margin: 0;
-}
-
-.error {
-  color: #BA0C2F;
-}
-
-.btn-danger {
-  background: none;
-  border: 1px solid #BA0C2F;
-  color: #BA0C2F;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-danger:hover {
-  background: #BA0C2F;
-  color: #fff;
-}
-
-.btn-danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

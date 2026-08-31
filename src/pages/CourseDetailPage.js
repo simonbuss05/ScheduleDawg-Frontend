@@ -6,9 +6,10 @@ import { getCourseById, deleteCourse } from '../api/courseApi';
 import { getMeetings, deleteMeeting } from '../api/meetingApi';
 import { getAssignments, deleteAssignment } from '../api/assignmentApi';
 import { getEvents, createEvent, deleteEvent } from '../api/eventApi';
-import { getSyllabiByCourse, getSyllabusDownloadUrl } from '../api/syllabusApi';
+import { getSyllabiByCourse, getSyllabusFile } from '../api/syllabusApi';
 import { formatDateWithWeekday } from '../utils/dateUtils';
 import { formatTime } from '../utils/time';
+import { getCourseColor } from '../utils/courseColor';
 import { useConfirm } from '../context/ConfirmContext';
 import MeetingForm from '../components/MeetingForm';
 import MeetingRow from '../components/MeetingRow';
@@ -34,6 +35,20 @@ function CourseDetailPage() {
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [viewingSyllabus, setViewingSyllabus] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+
+  useEffect(() => {
+    if (!viewingSyllabus || syllabi.length === 0) return undefined;
+    let objectUrl;
+    getSyllabusFile(syllabi[0].id).then((res) => {
+      objectUrl = URL.createObjectURL(res.data);
+      setPdfUrl(objectUrl);
+    });
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      setPdfUrl(null);
+    };
+  }, [viewingSyllabus, syllabi]);
 
   const loadEvents = (meetingList) => {
     if (meetingList.length === 0) return Promise.resolve([]);
@@ -138,7 +153,7 @@ const sortedMeetings = [...meetings].sort(
   const sortedEvents = [...events].sort((a, b) => a.eventDate.localeCompare(b.eventDate));
 
   return (
-    <div className="page-shell">
+    <div className="page-shell" style={{ '--course-color': getCourseColor(courseId) }}>
       <div className="fixed-top">
         <button className="back-link" onClick={() => navigate(-1)}>&larr; Back</button>
         <div className="course-header">
@@ -312,11 +327,11 @@ const sortedMeetings = [...meetings].sort(
               <span>{syllabi[0].fileName}</span>
               <button className="btn-secondary" onClick={() => setViewingSyllabus(false)}>Close</button>
             </div>
-            <iframe
-              title="Syllabus PDF"
-              src={getSyllabusDownloadUrl(syllabi[0].id)}
-              className="pdf-iframe"
-            />
+            {pdfUrl ? (
+              <iframe title="Syllabus PDF" src={pdfUrl} className="pdf-iframe" />
+            ) : (
+              <p className="empty-state">Loading…</p>
+            )}
           </div>
         </div>
       )}

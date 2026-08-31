@@ -6,7 +6,7 @@ import { getGradedItems } from '../api/gradedItemApi';
 import { calculateCurrentGrade, getGradeColor } from '../utils/gradeCalculator';
 import './CourseGradeSummary.css';
 
-function CourseGradeSummary({ courseId }) {
+function CourseGradeSummary({ courseId, onColor }) {
   const [categories, setCategories] = useState(null);
   const [itemsByCategoryId, setItemsByCategoryId] = useState({});
   const [scale, setScale] = useState(null);
@@ -30,21 +30,26 @@ function CourseGradeSummary({ courseId }) {
     );
   }, [courseId]);
 
+  const emptyClass = `grade-summary-empty${onColor ? ' on-color' : ''}`;
+
   if (!loaded) {
-    return <span className="grade-summary-loading">Loading...</span>;
+    return <span className={`grade-summary-loading${onColor ? ' on-color' : ''}`}>Loading...</span>;
   }
 
   if (categories.length === 0) {
-    return <span className="grade-summary-empty">No grade categories set up</span>;
+    return <span className={emptyClass}>No grade categories set up</span>;
   }
 
   const { currentGrade, letter } = calculateCurrentGrade(categories, itemsByCategoryId, scale);
 
   if (currentGrade === null) {
-    return <span className="grade-summary-empty">No grades entered yet</span>;
+    return <span className={emptyClass}>No grades entered yet</span>;
   }
 
-  const color = getGradeColor(letter);
+  // On a solid course-colored background, the semantic letter-grade color
+  // (green/red/etc) can vanish or clash against the card's own color —
+  // fall back to plain white there and let the letter carry the meaning.
+  const color = onColor ? '#fff' : getGradeColor(letter);
 
   return (
     <div className="grade-summary-value">

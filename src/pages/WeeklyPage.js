@@ -1,11 +1,13 @@
 // src/pages/WeeklyPage.js
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllMeetingsWithCourses, getAllEventsWithDetails } from '../api/scheduleApi';
+import { getAllMeetingsWithCourses, getAllEventsWithDetails, getAllAssignmentsWithCourses } from '../api/scheduleApi';
 import { getMonday, addDays, toDateString, formatDayHeader, formatWeekRange, isWeekend } from '../utils/dateUtils';
 import { formatTime, formatDuration } from '../utils/time';
+import { getCourseColor } from '../utils/courseColor';
 import CourseForm from '../components/CourseForm';
 import EventBadge from '../components/EventBadge';
+import DueBadge from '../components/DueBadge';
 import './WeeklyPage.css';
 
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
@@ -23,19 +25,24 @@ function WeeklyPage() {
   const [weekStart, setWeekStart] = useState(getMonday(new Date()));
   const [meetings, setMeetings] = useState([]);
   const [events, setEvents] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [showCourseForm, setShowCourseForm] = useState(false);
   const scrollRef = useRef(null);
 
   const load = () => {
     setLoading(true);
+    setLoadError(null);
     getAllMeetingsWithCourses().then((allMeetings) => {
       setMeetings(allMeetings);
-      return getAllEventsWithDetails(allMeetings);
-    }).then((allEvents) => {
+      return Promise.all([getAllEventsWithDetails(allMeetings), getAllAssignmentsWithCourses()]);
+    }).then(([allEvents, allAssignments]) => {
       setEvents(allEvents);
-      setLoading(false);
-    });
+      setAssignments(allAssignments.filter((a) => !a.completed));
+    }).catch(() => {
+      setLoadError('Could not load your schedule. Is the backend running?');
+    }).finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -105,6 +112,13 @@ function WeeklyPage() {
       </div>
 
       <div className="scroll-region" ref={scrollRef}>
+        {loadError && (
+          <div className="load-error-banner">
+            <span>{loadError}</span>
+            <button className="btn-secondary" onClick={load}>Retry</button>
+          </div>
+        )}
+
         {showCourseForm && (
           <CourseForm onCourseCreated={handleCourseCreated} onCancel={() => setShowCourseForm(false)} />
         )}
@@ -123,6 +137,7 @@ function WeeklyPage() {
             const dateForColumn = weekDates[i];
             const dateStr = toDateString(dateForColumn);
             const dayEvents = events.filter((ev) => ev.eventDate === dateStr);
+            const dayAssignments = assignments.filter((a) => a.dueDate === dateStr);
             const isToday = dateStr === todayStr;
 
             return (
@@ -132,6 +147,7 @@ function WeeklyPage() {
                   <span className="day-header-date">
                     {formatDayHeader(dateForColumn)}
                     {isToday && <span className="today-dot" />}
+                    <DueBadge assignments={dayAssignments} />
                   </span>
                 </div>
                 <div
@@ -153,7 +169,7 @@ function WeeklyPage() {
                         <div
                           key={m.id}
                           className="meeting-block"
-                          style={{ top, height }}
+                          style={{ top, height, '--course-color': getCourseColor(m.course.id) }}
                         >
                           <Link
                             to={`/courses/${m.course.id}`}

@@ -1,35 +1,23 @@
 .course-form {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 24px;
   max-width: 460px;
+  box-shadow: var(--shadow-sm);
 }
 
 .course-form h3 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 23px;
   margin: 0 0 16px;
 }
 
 .course-form label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #4B5563;
   margin-bottom: 12px;
-}
-
-.course-form input {
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 4px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  box-sizing: border-box;
 }
 
 .time-row {
@@ -42,7 +30,7 @@
 }
 
 .meeting-entries {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   margin-top: 8px;
   padding-top: 12px;
 }
@@ -50,12 +38,12 @@
 .meeting-entries-title {
   font-size: 13px;
   font-weight: 600;
-  color: #4B5563;
+  color: var(--color-text-muted);
   margin: 0 0 12px;
 }
 
 .meeting-entry {
-  background: #FAFAF8;
+  background: var(--color-bg);
   border-radius: 6px;
   padding: 12px;
   margin-bottom: 12px;
@@ -65,7 +53,7 @@
 .remove-entry-btn {
   background: none;
   border: none;
-  color: #BA0C2F;
+  color: var(--color-primary);
   font-size: 12px;
   cursor: pointer;
   padding: 0;
@@ -77,26 +65,9 @@
   margin-top: 8px;
 }
 
-.btn-primary {
-  background: #BA0C2F;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  background: #f0f0f0;
-  color: #333;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
+@media (max-width: 500px) {
+  .time-row {
+    flex-direction: column;
+    gap: 12px;
+  }
 }

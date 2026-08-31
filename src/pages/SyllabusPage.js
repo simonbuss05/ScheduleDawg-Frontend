@@ -1,9 +1,10 @@
 // src/pages/SyllabusPage.js
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { X, FileText } from 'lucide-react';
 import { getCourses } from '../api/courseApi';
-import { getAllSyllabi, deleteSyllabus, getSyllabusDownloadUrl } from '../api/syllabusApi';
+import { getAllSyllabi, deleteSyllabus, getSyllabusFile } from '../api/syllabusApi';
+import { getCourseColor } from '../utils/courseColor';
 import { useConfirm } from '../context/ConfirmContext';
 import SyllabusUploadForm from '../components/SyllabusUploadForm';
 import SyllabusReviewPanel from '../components/SyllabusReviewPanel';
@@ -15,13 +16,29 @@ function SyllabusPage() {
   const [courses, setCourses] = useState([]);
   const [syllabi, setSyllabi] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [showUpload, setShowUpload] = useState(false);
   const [uploadCourseId, setUploadCourseId] = useState('');
   const [pendingReview, setPendingReview] = useState(null);
   const [viewingSyllabus, setViewingSyllabus] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+
+  useEffect(() => {
+    if (!viewingSyllabus) return undefined;
+    let objectUrl;
+    getSyllabusFile(viewingSyllabus.id).then((res) => {
+      objectUrl = URL.createObjectURL(res.data);
+      setPdfUrl(objectUrl);
+    });
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      setPdfUrl(null);
+    };
+  }, [viewingSyllabus]);
 
   const load = () => {
     setLoading(true);
+    setLoadError(null);
     Promise.all([getCourses(), getAllSyllabi()])
       .then(([coursesRes, syllabiRes]) => {
         setCourses(coursesRes.data);
@@ -34,6 +51,7 @@ function SyllabusPage() {
           setShowUpload(true);
         }
       })
+      .catch(() => setLoadError('Could not load syllabi. Is the backend running?'))
       .finally(() => setLoading(false));
   };
 
@@ -83,6 +101,13 @@ function SyllabusPage() {
         )}
       </div>
 
+      {loadError && (
+        <div className="load-error-banner">
+          <span>{loadError}</span>
+          <button className="btn-secondary" onClick={load}>Retry</button>
+        </div>
+      )}
+
       <div className="scroll-region">
         {showUpload && (
           <div className="upload-panel card">
@@ -125,10 +150,20 @@ function SyllabusPage() {
         ) : (
           <ul className="syllabus-list">
             {syllabi.map((s) => (
-              <li key={s.id} className="syllabus-row card">
+              <li
+                key={s.id}
+                className="syllabus-row card"
+                style={{ '--course-color': getCourseColor(s.course?.id) }}
+              >
                 <div className="syllabus-info">
                   <span className="syllabus-name">{s.fileName}</span>
-                  <span className="syllabus-course">{courseName(s.course?.id)}</span>
+                  {s.course?.id ? (
+                    <Link to={`/courses/${s.course.id}`} className="syllabus-course">
+                      {courseName(s.course.id)}
+                    </Link>
+                  ) : (
+                    <span className="syllabus-course">{courseName(s.course?.id)}</span>
+                  )}
                 </div>
                 <div className="syllabus-actions">
                   <button className="btn-secondary" onClick={() => setViewingSyllabus(s)}>
@@ -151,11 +186,11 @@ function SyllabusPage() {
               <span>{viewingSyllabus.fileName}</span>
               <button className="btn-secondary" onClick={() => setViewingSyllabus(null)}>Close</button>
             </div>
-            <iframe
-              title="Syllabus PDF"
-              src={getSyllabusDownloadUrl(viewingSyllabus.id)}
-              className="pdf-iframe"
-            />
+            {pdfUrl ? (
+              <iframe title="Syllabus PDF" src={pdfUrl} className="pdf-iframe" />
+            ) : (
+              <p className="empty-state">Loading…</p>
+            )}
           </div>
         </div>
       )}

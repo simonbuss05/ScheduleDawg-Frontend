@@ -5,21 +5,16 @@
   margin-top: 4px;
 }
 
-.time-picker select,
-.time-picker-minute {
-  padding: 7px 8px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  box-sizing: border-box;
+.time-picker select {
+  width: auto;
 }
 
-.time-picker-minute {
-  width: 40px;
+.time-picker input.time-picker-minute {
+  width: 46px;
   text-align: center;
 }
 
 .time-picker-colon {
-  font-weight: 600;
-  color: #4B5563;
+  font-weight: 700;
+  color: var(--color-text-muted);
 }

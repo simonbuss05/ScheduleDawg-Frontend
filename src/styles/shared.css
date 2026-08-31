@@ -9,6 +9,30 @@
   --color-warning: #d97706;
   --radius: 8px;
   --radius-sm: 6px;
+
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --shadow-sm: 0 1px 2px rgba(19, 19, 19, 0.06);
+  --shadow-md: 0 4px 16px rgba(19, 19, 19, 0.08);
+  --shadow-hover: 0 8px 24px rgba(19, 19, 19, 0.12);
+
+  /* Deterministic per-course accent palette — see src/utils/courseColor.js */
+  --course-1: #BA0C2F;
+  --course-2: #1D6E9C;
+  --course-3: #B8860B;
+  --course-4: #4B7F52;
+  --course-5: #6B4FA0;
+  --course-6: #C2622A;
+  --course-7: #0E7C86;
+  --course-8: #9C4A70;
 }
 
 .card {
@@ -16,6 +40,102 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Form primitives — shared by every form in the app so one pass here
+   improves CourseForm, MeetingForm, AssignmentForm, EventForm, CategoryCard, etc. */
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+input[type='date'],
+input:not([type]),
+select,
+textarea {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  background: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.12);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9aa0a6;
+}
+
+label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.course-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--color-text-muted);
+}
+
+.course-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--course-color, var(--color-primary));
+  flex-shrink: 0;
+}
+
+.load-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #FDECEC;
+  border: 1px solid #F3C6C6;
+  color: #8A1F1F;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.load-error-banner .btn-secondary {
+  flex-shrink: 0;
+}
+
+@media (max-width: 860px) {
+  .page-header {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .page-title {
+    font-size: 27px;
+  }
+
+  .nav-bar {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
 }
 
 .btn-primary {
@@ -120,15 +240,17 @@
 }
 
 .section-header h3 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
   margin: 0;
   color: var(--color-text);
 }
 
 .page-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
   color: var(--color-text);
   margin: 0;
 }

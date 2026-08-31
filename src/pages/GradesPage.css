@@ -4,25 +4,25 @@
   height: 100%;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
-
-.page-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
-  color: #131313;
-  margin: 0;
-}
-
 .scroll-region {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+}
+
+.archived-semester-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .back-link {
@@ -48,7 +48,8 @@
 }
 
 .grades-course-heading h3 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 24px;
   margin: 0;
   color: var(--color-text);
@@ -57,7 +58,7 @@
 .grades-course-code {
   font-size: 12px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--course-color, var(--color-primary));
 }
 
 .grades-syllabus-btn {
@@ -66,18 +67,17 @@
 
 .course-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
 }
 
 .course-summary-card {
-  background: #fff;
-  border: 1px solid #eee;
-  border-left: 4px solid #BA0C2F;
+  background: var(--course-color, var(--color-primary));
   border-radius: 10px;
-  padding: 14px;
+  padding: 18px;
   text-align: left;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   display: flex;
   flex-direction: column;
@@ -86,7 +86,7 @@
 
 .course-summary-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-hover);
 }
 
 .course-summary-top {
@@ -96,26 +96,26 @@
 }
 
 .course-summary-name {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
-  color: #131313;
+  color: #fff;
 }
 
 .course-summary-chevron {
   font-size: 20px;
-  color: #ccc;
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 700;
 }
 
 .course-summary-card:hover .course-summary-chevron {
-  color: #BA0C2F;
+  color: #fff;
 }
 
 .course-summary-code {
   font-size: 11px;
   font-weight: 700;
-  color: #BA0C2F;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .grade-summary-body {
@@ -147,7 +147,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: #4B5563;
+  color: var(--color-text-muted);
 }
 
 .current-grade-value {
@@ -158,22 +158,23 @@
 }
 
 .current-grade-percent {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 42px;
+  font-family: var(--font-display);
+  font-size: 44px;
   font-weight: 700;
-  color: #131313;
+  color: var(--color-text);
 }
 
 .current-grade-letter {
   font-size: 22px;
   font-weight: 700;
-  color: #BA0C2F;
+  color: var(--color-primary);
 }
 
 .target-card h3,
 .scale-card h3 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
   margin: 0 0 10px;
 }
 
@@ -182,28 +183,24 @@
   gap: 8px;
 }
 
-.target-form input {
+.target-form input:not([type]) {
   flex: 1;
-  padding: 7px 9px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
 }
 
 .target-result {
   margin-top: 12px;
   font-size: 13px;
-  color: #131313;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
 .target-good {
-  color: #16a34a;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .target-bad {
-  color: #BA0C2F;
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -214,13 +211,11 @@
   margin-bottom: 12px;
 }
 
-.scale-form input,
-.category-form input {
+.scale-form input:not([type]),
+.scale-form input[type='number'],
+.category-form input:not([type]),
+.category-form input[type='number'] {
   flex: 1;
-  padding: 7px 9px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
 }
 
 .scale-list {
@@ -236,20 +231,21 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 8px;
-  background: #FAFAF8;
-  border-radius: 6px;
+  padding: 7px 10px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
   font-size: 13px;
 }
 
 .scale-letter {
   font-weight: 700;
   min-width: 30px;
+  color: var(--color-text);
 }
 
 .scale-min {
   flex: 1;
-  color: #4B5563;
+  color: var(--color-text-muted);
 }
 
 .category-grid {
@@ -257,4 +253,10 @@
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 10px;
   align-items: start;
+}
+
+@media (max-width: 860px) {
+  .grades-layout {
+    grid-template-columns: 1fr;
+  }
 }
