@@ -14,6 +14,11 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* On mobile, html stretches to the full viewport (min-height: 100% below)
+     but body only grows to fit its actual content, which is often shorter.
+     Without an explicit background here, whatever's behind the page shows
+     through that gap instead of the app's own background. */
+  background: var(--color-bg);
 }
 
 code {

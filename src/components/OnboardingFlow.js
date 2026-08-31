@@ -128,6 +128,7 @@ function OnboardingFlow({ onComplete }) {
               <li><strong>Weekly</strong> — your full week at a glance; each course gets its own color, and a "N due" badge appears on days with assignments</li>
               <li><strong>Coursework</strong> — every assignment and event in one list, grouped into Overdue / This Week / Upcoming / Done</li>
               <li><strong>Grades &amp; Syllabus</strong> — grade tracking and syllabus uploads per course</li>
+              <li><strong>Plan Ahead</strong> — before you register for next semester, add a course you're considering and see who's teaching it, their syllabus and grading breakdown, and a link to their RateMyProfessors reviews</li>
               <li><strong>Semesters</strong> — the pill under the logo in the sidebar. When a term ends, use "End Semester &amp; Start New" to archive it and start with a clean course list — old semesters stay fully intact and browsable</li>
             </ul>
             <div className="onboarding-actions">

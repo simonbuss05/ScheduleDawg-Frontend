@@ -6,3 +6,6 @@ export const loginUser = (email, password) => api.post('/auth/login', { email, p
 export const getCurrentUser = () => api.get('/auth/me');
 export const changePassword = (currentPassword, newPassword) =>
   api.put('/auth/password', { currentPassword, newPassword });
+export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
+export const resetPassword = (token, newPassword) =>
+  api.post('/auth/reset-password', { token, newPassword });

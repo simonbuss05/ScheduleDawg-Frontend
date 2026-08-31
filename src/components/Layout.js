@@ -64,6 +64,10 @@ function Layout() {
 
           <div className="nav-divider" />
 
+          <NavLink to="/plan-ahead" className="nav-link">Plan Ahead</NavLink>
+
+          <div className="nav-divider" />
+
           <NavLink to="/settings" className="nav-link">Settings</NavLink>
         </nav>
 

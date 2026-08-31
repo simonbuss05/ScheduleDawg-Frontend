@@ -43,6 +43,9 @@ function LoginPage() {
         </button>
 
         <p className="auth-switch">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
+        <p className="auth-switch">
           Don't have an account? <Link to="/register">Sign up</Link>
         </p>
       </form>
