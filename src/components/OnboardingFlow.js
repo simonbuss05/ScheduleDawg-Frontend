@@ -6,11 +6,14 @@ import './OnboardingFlow.css';
 
 const STEPS = ['welcome', 'course', 'syllabus', 'grades', 'address', 'tour', 'done'];
 
-function OnboardingFlow({ onComplete }) {
-  const [step, setStep] = useState(0);
+function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
+  const [step, setStep] = useState(initialStep);
   const [newCourseId, setNewCourseId] = useState(null);
   const stepName = STEPS[step];
-  const goTo = (i) => setStep(i);
+  const goTo = (i) => {
+    setStep(i);
+    onStepChange?.(i);
+  };
 
   return (
     <div className="onboarding-overlay">

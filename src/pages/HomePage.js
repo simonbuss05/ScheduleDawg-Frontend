@@ -22,6 +22,12 @@ import './HomePage.css';
 // the same computer still gets its own first-run tour instead of inheriting
 // whichever account last dismissed it in this browser.
 const onboardingKeyFor = (userId) => `scheduledawg_onboarded_${userId}`;
+// Several onboarding steps link out to a real page (Syllabus, Grades,
+// Settings) to actually perform the action, which navigates away from Home
+// and unmounts this component entirely. Persisting the in-progress step
+// means coming back to Home resumes the tour instead of it just vanishing
+// with no way to pick it back up.
+const onboardingStepKeyFor = (userId) => `scheduledawg_onboarding_step_${userId}`;
 
 const LEG_COLORS = ['#FFC72C', '#00B4A6', '#8B5CF6', '#FF7A45', '#3B82F6', '#EC4899'];
 
@@ -138,21 +144,42 @@ function HomePage() {
 
   const homeAddress = homeSettings?.homeAddress || null;
 
+  const savedOnboardingStep = user?.id ? localStorage.getItem(onboardingStepKeyFor(user.id)) : null;
+
+  // Once onboarding has actually started (a step was saved), keep showing it
+  // regardless of course count — the "course" step adding a course is what
+  // used to make `courses.length === 0` go false and silently cancel the
+  // rest of the tour. Only gate the very first appearance on having no
+  // courses yet, so it doesn't ambush an existing user whose localStorage
+  // got cleared.
   const showOnboarding =
     !onboardingDismissed &&
-    courses.length === 0 &&
     !!user?.id &&
-    !localStorage.getItem(onboardingKeyFor(user.id));
+    !localStorage.getItem(onboardingKeyFor(user.id)) &&
+    (savedOnboardingStep !== null || courses.length === 0);
+
+  const handleOnboardingStepChange = (step) => {
+    if (user?.id) localStorage.setItem(onboardingStepKeyFor(user.id), String(step));
+  };
 
   const handleOnboardingComplete = () => {
-    if (user?.id) localStorage.setItem(onboardingKeyFor(user.id), 'true');
+    if (user?.id) {
+      localStorage.setItem(onboardingKeyFor(user.id), 'true');
+      localStorage.removeItem(onboardingStepKeyFor(user.id));
+    }
     setOnboardingDismissed(true);
     load();
   };
 
   return (
     <div className="page-shell">
-      {showOnboarding && <OnboardingFlow onComplete={handleOnboardingComplete} />}
+      {showOnboarding && (
+        <OnboardingFlow
+          initialStep={savedOnboardingStep !== null ? Number(savedOnboardingStep) : 0}
+          onStepChange={handleOnboardingStepChange}
+          onComplete={handleOnboardingComplete}
+        />
+      )}
       <div className="page-header">
         <h2 className="page-title">Home</h2>
         <div className="nav-bar">
