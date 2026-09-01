@@ -6,12 +6,14 @@ import { getCourses } from '../api/courseApi';
 import { getAllSyllabi, deleteSyllabus, getSyllabusFile } from '../api/syllabusApi';
 import { getCourseColor } from '../utils/courseColor';
 import { useConfirm } from '../context/ConfirmContext';
+import { useOnboarding } from '../context/OnboardingContext';
 import SyllabusUploadForm from '../components/SyllabusUploadForm';
 import SyllabusReviewPanel from '../components/SyllabusReviewPanel';
 import './SyllabusPage.css';
 
 function SyllabusPage() {
   const confirm = useConfirm();
+  const { resumeIfAt } = useOnboarding();
   const [searchParams] = useSearchParams();
   const [courses, setCourses] = useState([]);
   const [syllabi, setSyllabi] = useState([]);
@@ -72,6 +74,14 @@ function SyllabusPage() {
   const handleReviewDone = () => {
     setPendingReview(null);
     load();
+    // Fires once the user has actually finished with this syllabus —
+    // whether they saved the extracted grading info or discarded it. If
+    // onboarding sent them here, that's the real completion signal for its
+    // "syllabus" step, so pop the overlay back up right away instead of
+    // waiting for them to leave the page. Firing this any earlier (right on
+    // upload) would bury the review panel itself under the overlay before
+    // they'd had a chance to look at it.
+    resumeIfAt('grades');
   };
 
   const handleDelete = async (syllabus) => {

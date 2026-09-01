@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { OnboardingProvider } from '../context/OnboardingContext';
 import SemesterSwitcher from './SemesterSwitcher';
 import OnboardingFlow from './OnboardingFlow';
 import './Layout.css';
@@ -25,66 +26,68 @@ function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="app-shell">
-      <OnboardingFlow />
-      <button
-        type="button"
-        className="mobile-menu-toggle"
-        onClick={() => setMenuOpen(true)}
-        aria-label="Open menu"
-      >
-        <Menu size={22} />
-      </button>
+    <OnboardingProvider>
+      <div className="app-shell">
+        <OnboardingFlow />
+        <button
+          type="button"
+          className="mobile-menu-toggle"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu size={22} />
+        </button>
 
-      {menuOpen && <div className="sidebar-backdrop" onClick={() => setMenuOpen(false)} />}
+        {menuOpen && <div className="sidebar-backdrop" onClick={() => setMenuOpen(false)} />}
 
-      <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
-        <div className="sidebar-top">
-          <h1 className="sidebar-logo">ScheduleDawg</h1>
-          <button
-            type="button"
-            className="sidebar-close"
-            onClick={() => setMenuOpen(false)}
-            aria-label="Close menu"
-          >
-            <X size={20} />
-          </button>
-        </div>
+        <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
+          <div className="sidebar-top">
+            <h1 className="sidebar-logo">ScheduleDawg</h1>
+            <button
+              type="button"
+              className="sidebar-close"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          </div>
 
-        <SemesterSwitcher />
+          <SemesterSwitcher />
 
-        <nav className="sidebar-nav">
-          <NavLink to="/" end className="nav-link">Home</NavLink>
-          <NavLink to="/weekly" className="nav-link">Weekly</NavLink>
-          <NavLink to="/coursework" className="nav-link">Coursework</NavLink>
+          <nav className="sidebar-nav">
+            <NavLink to="/" end className="nav-link">Home</NavLink>
+            <NavLink to="/weekly" className="nav-link">Weekly</NavLink>
+            <NavLink to="/coursework" className="nav-link">Coursework</NavLink>
 
-          <div className="nav-divider" />
+            <div className="nav-divider" />
 
-          <NavLink to="/courses" className="nav-link">Courses</NavLink>
-          <NavLink to="/grades" className="nav-link">Grades</NavLink>
-          <NavLink to="/syllabus" className="nav-link">Syllabus</NavLink>
+            <NavLink to="/courses" className="nav-link">Courses</NavLink>
+            <NavLink to="/grades" className="nav-link">Grades</NavLink>
+            <NavLink to="/syllabus" className="nav-link">Syllabus</NavLink>
 
-          <div className="nav-divider" />
+            <div className="nav-divider" />
 
-          <NavLink to="/plan-ahead" className="nav-link">Plan Ahead</NavLink>
+            <NavLink to="/plan-ahead" className="nav-link">Plan Ahead</NavLink>
 
-          <div className="nav-divider" />
+            <div className="nav-divider" />
 
-          <NavLink to="/settings" className="nav-link">Settings</NavLink>
-        </nav>
+            <NavLink to="/settings" className="nav-link">Settings</NavLink>
+          </nav>
 
-        <div className="sidebar-footer">
-          {user && <span className="sidebar-user-email">{user.email}</span>}
-          <button type="button" className="sidebar-logout" onClick={handleLogout}>
-            <LogOut size={15} />
-            Log out
-          </button>
-        </div>
-      </aside>
-      <main className="content">
-        <Outlet />
-      </main>
-    </div>
+          <div className="sidebar-footer">
+            {user && <span className="sidebar-user-email">{user.email}</span>}
+            <button type="button" className="sidebar-logout" onClick={handleLogout}>
+              <LogOut size={15} />
+              Log out
+            </button>
+          </div>
+        </aside>
+        <main className="content">
+          <Outlet />
+        </main>
+      </div>
+    </OnboardingProvider>
   );
 }
 

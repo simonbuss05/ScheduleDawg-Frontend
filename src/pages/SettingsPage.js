@@ -6,6 +6,7 @@ import { changePassword, deleteAccount } from '../api/authApi';
 import { geocodeAddress } from '../utils/geocoding';
 import { useAuth } from '../context/AuthContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useOnboarding } from '../context/OnboardingContext';
 import './SettingsPage.css';
 
 function combineAddress({ street, city, state, zip }) {
@@ -16,6 +17,7 @@ function SettingsPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const confirm = useConfirm();
+  const { resumeIfAt } = useOnboarding();
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -72,7 +74,10 @@ function SettingsPage() {
         setResolvedAddress(placeName);
         return updateSettings({ homeAddress: fullAddress, homeLatitude: lat, homeLongitude: lng });
       })
-      .then(() => setSuccess(true))
+      .then(() => {
+        setSuccess(true);
+        resumeIfAt('tour');
+      })
       .catch(() => setError('Could not find that address. Double-check the fields and try again.'))
       .finally(() => setSaving(false));
   };

@@ -13,6 +13,7 @@ import {
   getGradeColor,
 } from '../utils/gradeCalculator';
 import { useConfirm } from '../context/ConfirmContext';
+import { useOnboarding } from '../context/OnboardingContext';
 import { getCourseColor } from '../utils/courseColor';
 import CategoryCard from '../components/CategoryCard';
 import CourseGradeSummary from '../components/CourseGradeSummary';
@@ -20,6 +21,7 @@ import './GradesPage.css';
 
 function GradesPage() {
   const confirm = useConfirm();
+  const { resumeIfAt } = useOnboarding();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const semesterId = searchParams.get('semesterId');
@@ -150,6 +152,10 @@ function GradesPage() {
         setNewCategoryName('');
         setNewCategoryWeight('');
         setShowCategoryForm(false);
+        // If onboarding sent the user here, adding a category is the
+        // concrete signal that this step is actually done — resume right
+        // away instead of waiting for them to navigate elsewhere.
+        resumeIfAt('address');
       })
       .catch(() => setCategoryFormError('Could not add that category.'));
   };

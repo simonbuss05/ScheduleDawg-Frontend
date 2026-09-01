@@ -1,64 +1,17 @@
 // src/components/OnboardingFlow.js
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { onboardingKeyFor, onboardingStepKeyFor } from '../context/onboardingStorage';
+import { Link } from 'react-router-dom';
+import { useOnboarding, STEPS } from '../context/OnboardingContext';
 import CourseForm from './CourseForm';
 import './OnboardingFlow.css';
 
-const STEPS = ['welcome', 'course', 'syllabus', 'grades', 'address', 'tour', 'done'];
-
-// Mounted once in Layout, so it can appear on top of any page — not just
-// Home. A few steps send the user off to a real page (Syllabus, Grades,
-// Settings) to actually do the thing; goTo's `hideUntilPath` suppresses the
-// overlay just for that one destination page (so it doesn't block the task
-// it just sent them to do), and it reappears on its own the moment they
-// navigate anywhere else — including back to the page they were already on.
+// Mounted once in Layout (inside OnboardingProvider), so it can appear on
+// top of any page — not just Home. See OnboardingContext for how steps that
+// send the user to a real page (Syllabus, Grades, Settings) get suppressed
+// there and resumed.
 function OnboardingFlow() {
-  const { user } = useAuth();
-  const location = useLocation();
+  const { visible, step, stepName, newCourseId, setNewCourseId, goTo, complete } = useOnboarding();
 
-  const [active, setActive] = useState(false);
-  const [step, setStep] = useState(0);
-  const [hiddenAtPath, setHiddenAtPath] = useState(null);
-  const [newCourseId, setNewCourseId] = useState(null);
-
-  useEffect(() => {
-    if (!user?.id) {
-      setActive(false);
-      return;
-    }
-    if (localStorage.getItem(onboardingKeyFor(user.id))) {
-      setActive(false);
-      return;
-    }
-    const saved = localStorage.getItem(onboardingStepKeyFor(user.id));
-    if (saved === null) {
-      setActive(false);
-      return;
-    }
-    setStep(Number(saved));
-    setActive(true);
-  }, [user?.id]);
-
-  const goTo = (i, hideUntilPath = null) => {
-    setStep(i);
-    setHiddenAtPath(hideUntilPath);
-    if (user?.id) localStorage.setItem(onboardingStepKeyFor(user.id), String(i));
-  };
-
-  const complete = () => {
-    if (user?.id) {
-      localStorage.setItem(onboardingKeyFor(user.id), 'true');
-      localStorage.removeItem(onboardingStepKeyFor(user.id));
-    }
-    setActive(false);
-  };
-
-  if (!active) return null;
-  if (hiddenAtPath && location.pathname === hiddenAtPath) return null;
-
-  const stepName = STEPS[step];
+  if (!visible) return null;
 
   return (
     <div className="onboarding-overlay">
