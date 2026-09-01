@@ -5,7 +5,28 @@
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+}
+
+.plan-ahead-term-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.plan-ahead-term-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-text-muted);
+  margin-right: 2px;
+}
+
+.plan-ahead-term-picker select {
+  width: auto;
+  min-width: 100px;
 }
 
 .scroll-region {
@@ -52,13 +73,10 @@
   width: 110px;
 }
 
-.plan-ahead-form-term {
-  width: 160px !important;
-}
-
-.plan-ahead-form-optional {
-  font-weight: 400;
-  text-transform: none;
+.plan-ahead-form-term-note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0 0 10px;
 }
 
 .plan-ahead-form-row .btn-primary {
@@ -103,7 +121,7 @@
 
 .plan-ahead-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 

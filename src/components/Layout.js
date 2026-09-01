@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SemesterSwitcher from './SemesterSwitcher';
+import OnboardingFlow from './OnboardingFlow';
 import './Layout.css';
 
 function Layout() {
@@ -25,6 +26,7 @@ function Layout() {
 
   return (
     <div className="app-shell">
+      <OnboardingFlow />
       <button
         type="button"
         className="mobile-menu-toggle"

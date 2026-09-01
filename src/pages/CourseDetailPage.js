@@ -1,8 +1,8 @@
 // src/pages/CourseDetailPage.js
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FileText, GraduationCap } from 'lucide-react';
-import { getCourseById, deleteCourse } from '../api/courseApi';
+import { FileText, GraduationCap, Pencil } from 'lucide-react';
+import { getCourseById, updateCourse, deleteCourse } from '../api/courseApi';
 import { getMeetings, deleteMeeting } from '../api/meetingApi';
 import { getAssignments, deleteAssignment } from '../api/assignmentApi';
 import { getEvents, createEvent, deleteEvent } from '../api/eventApi';
@@ -30,6 +30,12 @@ function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+
+  const [editingCourse, setEditingCourse] = useState(false);
+  const [editForm, setEditForm] = useState(null);
+  const [editError, setEditError] = useState(null);
+  const [savingCourse, setSavingCourse] = useState(false);
 
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
@@ -135,13 +141,54 @@ function CourseDetailPage() {
     });
     if (!ok) return;
 
+    setDeleteError(null);
     setDeleting(true);
     deleteCourse(courseId)
       .then(() => navigate('/courses'))
       .catch(() => {
         setDeleting(false);
-        window.alert('Could not delete course. Try again.');
+        setDeleteError('Could not delete course. Try again.');
       });
+  };
+
+  const handleStartEdit = () => {
+    setEditError(null);
+    setEditForm({
+      name: course.name || '',
+      code: course.code || '',
+      professor: course.professor || '',
+      creditHours: course.creditHours != null ? String(course.creditHours) : '',
+    });
+    setEditingCourse(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCourse(false);
+    setEditError(null);
+  };
+
+  const handleSaveCourse = (e) => {
+    e.preventDefault();
+    setEditError(null);
+
+    if (!editForm.name.trim()) {
+      setEditError('Course name is required.');
+      return;
+    }
+    const credits = Number(editForm.creditHours);
+    if (editForm.creditHours === '' || isNaN(credits) || credits <= 0 || credits > 12) {
+      setEditError('Credit hours must be a number between 1 and 12.');
+      return;
+    }
+
+    setSavingCourse(true);
+    updateCourse(courseId, { ...editForm, creditHours: credits })
+      .then((res) => {
+        setCourse(res.data);
+        setEditingCourse(false);
+      })
+      .catch((err) => setEditError(err.response?.data?.message || 'Could not save changes.'))
+      .finally(() => setSavingCourse(false));
   };
 
   if (loading) return <p>Loading course...</p>;
@@ -160,15 +207,69 @@ const sortedMeetings = [...meetings].sort(
     <div className="page-shell" style={{ '--course-color': getCourseColor(courseId) }}>
       <div className="fixed-top">
         <button className="back-link" onClick={() => navigate(-1)}>&larr; Back</button>
-        <div className="course-header">
-          <div>
-            <h2>{course.name}</h2>
-            <p className="course-sub">{course.code} · {course.professor}</p>
+        {editingCourse ? (
+          <form className="course-edit-form" onSubmit={handleSaveCourse}>
+            {editError && <p className="error">{editError}</p>}
+            <div className="course-edit-row">
+              <label>
+                Course Name
+                <input
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  autoFocus
+                />
+              </label>
+              <label>
+                Course Code
+                <input
+                  value={editForm.code}
+                  onChange={(e) => setEditForm({ ...editForm, code: e.target.value })}
+                />
+              </label>
+            </div>
+            <div className="course-edit-row">
+              <label>
+                Professor
+                <input
+                  value={editForm.professor}
+                  onChange={(e) => setEditForm({ ...editForm, professor: e.target.value })}
+                />
+              </label>
+              <label>
+                Credit Hours
+                <input
+                  type="number"
+                  min="1"
+                  max="12"
+                  value={editForm.creditHours}
+                  onChange={(e) => setEditForm({ ...editForm, creditHours: e.target.value })}
+                />
+              </label>
+            </div>
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={handleCancelEdit}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={savingCourse}>
+                {savingCourse ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="course-header">
+            <div>
+              <h2>{course.name}</h2>
+              <p className="course-sub">{course.code} · {course.professor}</p>
+            </div>
+            <div className="course-header-actions">
+              <button className="icon-btn" onClick={handleStartEdit} title="Edit course">
+                <Pencil size={15} />
+              </button>
+              <button className="btn-danger" onClick={handleDeleteCourse} disabled={deleting}>
+                {deleting ? 'Deleting...' : 'Delete Course'}
+              </button>
+            </div>
           </div>
-          <button className="btn-danger" onClick={handleDeleteCourse} disabled={deleting}>
-            {deleting ? 'Deleting...' : 'Delete Course'}
-          </button>
-        </div>
+        )}
+        {deleteError && <p className="error">{deleteError}</p>}
 
         <div className="hub-stats-row">
           <div className="hub-stat-card">

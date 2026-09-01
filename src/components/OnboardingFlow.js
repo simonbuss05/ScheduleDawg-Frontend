@@ -1,19 +1,64 @@
 // src/components/OnboardingFlow.js
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { onboardingKeyFor, onboardingStepKeyFor } from '../context/onboardingStorage';
 import CourseForm from './CourseForm';
 import './OnboardingFlow.css';
 
 const STEPS = ['welcome', 'course', 'syllabus', 'grades', 'address', 'tour', 'done'];
 
-function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
-  const [step, setStep] = useState(initialStep);
+// Mounted once in Layout, so it can appear on top of any page — not just
+// Home. A few steps send the user off to a real page (Syllabus, Grades,
+// Settings) to actually do the thing; goTo's `hideUntilPath` suppresses the
+// overlay just for that one destination page (so it doesn't block the task
+// it just sent them to do), and it reappears on its own the moment they
+// navigate anywhere else — including back to the page they were already on.
+function OnboardingFlow() {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  const [active, setActive] = useState(false);
+  const [step, setStep] = useState(0);
+  const [hiddenAtPath, setHiddenAtPath] = useState(null);
   const [newCourseId, setNewCourseId] = useState(null);
-  const stepName = STEPS[step];
-  const goTo = (i) => {
+
+  useEffect(() => {
+    if (!user?.id) {
+      setActive(false);
+      return;
+    }
+    if (localStorage.getItem(onboardingKeyFor(user.id))) {
+      setActive(false);
+      return;
+    }
+    const saved = localStorage.getItem(onboardingStepKeyFor(user.id));
+    if (saved === null) {
+      setActive(false);
+      return;
+    }
+    setStep(Number(saved));
+    setActive(true);
+  }, [user?.id]);
+
+  const goTo = (i, hideUntilPath = null) => {
     setStep(i);
-    onStepChange?.(i);
+    setHiddenAtPath(hideUntilPath);
+    if (user?.id) localStorage.setItem(onboardingStepKeyFor(user.id), String(i));
   };
+
+  const complete = () => {
+    if (user?.id) {
+      localStorage.setItem(onboardingKeyFor(user.id), 'true');
+      localStorage.removeItem(onboardingStepKeyFor(user.id));
+    }
+    setActive(false);
+  };
+
+  if (!active) return null;
+  if (hiddenAtPath && location.pathname === hiddenAtPath) return null;
+
+  const stepName = STEPS[step];
 
   return (
     <div className="onboarding-overlay">
@@ -37,7 +82,7 @@ function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
               <li>Semesters: archive a finished term and start clean, without losing anything</li>
             </ul>
             <div className="onboarding-actions">
-              <button className="btn-secondary" onClick={onComplete}>Skip for now</button>
+              <button className="btn-secondary" onClick={complete}>Skip for now</button>
               <button className="btn-primary" onClick={() => goTo(1)}>Get Started</button>
             </div>
           </>
@@ -75,7 +120,7 @@ function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
               <Link
                 to={newCourseId ? `/syllabus?courseId=${newCourseId}` : '/syllabus'}
                 className="btn-primary"
-                onClick={() => goTo(3)}
+                onClick={() => goTo(3, '/syllabus')}
               >
                 Upload a syllabus
               </Link>
@@ -98,7 +143,7 @@ function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
               <Link
                 to={newCourseId ? `/grades?courseId=${newCourseId}` : '/grades'}
                 className="btn-primary"
-                onClick={() => goTo(4)}
+                onClick={() => goTo(4, '/grades')}
               >
                 Set up grades
               </Link>
@@ -116,7 +161,7 @@ function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
             </p>
             <div className="onboarding-actions">
               <button className="btn-secondary" onClick={() => goTo(5)}>Skip for now</button>
-              <Link to="/settings" className="btn-primary" onClick={() => goTo(5)}>
+              <Link to="/settings" className="btn-primary" onClick={() => goTo(5, '/settings')}>
                 Set it up now
               </Link>
             </div>
@@ -148,7 +193,7 @@ function OnboardingFlow({ onComplete, initialStep = 0, onStepChange }) {
               routes, due dates, grades — builds itself from there. Let's get started.
             </p>
             <div className="onboarding-actions">
-              <button className="btn-primary" onClick={onComplete}>Go to ScheduleDawg</button>
+              <button className="btn-primary" onClick={complete}>Go to ScheduleDawg</button>
             </div>
           </>
         )}

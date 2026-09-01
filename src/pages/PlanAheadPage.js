@@ -11,7 +11,35 @@ import {
 } from '../api/planAheadApi';
 import { getCourseColor } from '../utils/courseColor';
 import { useConfirm } from '../context/ConfirmContext';
+import { useAuth } from '../context/AuthContext';
 import './PlanAheadPage.css';
+
+const SEASONS = ['Spring', 'Summer', 'Fall'];
+
+function termStorageKey(userId) {
+  return `scheduledawg_planahead_term_${userId}`;
+}
+
+// A student planning ahead is almost always looking at the *next* term they
+// haven't registered for yet — default to that instead of making them pick
+// on every visit.
+function defaultTerm() {
+  const now = new Date();
+  const year = now.getFullYear();
+  return now.getMonth() <= 5 ? { season: 'Fall', year } : { season: 'Spring', year: year + 1 };
+}
+
+function loadSavedTerm(userId) {
+  try {
+    const raw = localStorage.getItem(termStorageKey(userId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (SEASONS.includes(parsed.season) && Number.isInteger(parsed.year)) return parsed;
+  } catch {
+    // ignore, fall through to default
+  }
+  return null;
+}
 
 // Instructors on the bulletin can appear once per section CRN under the same
 // name (e.g. three listings for one professor teaching three labs) — group
@@ -32,15 +60,28 @@ function dedupeInstructors(instructors) {
 
 function PlanAheadPage() {
   const confirm = useConfirm();
+  const { user } = useAuth();
 
   const [plannedCourses, setPlannedCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
 
+  const [term, setTerm] = useState(() => (user?.id && loadSavedTerm(user.id)) || defaultTerm());
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear, currentYear + 1, currentYear + 2, currentYear + 3];
+
+  const updateTerm = (updates) => {
+    const next = { ...term, ...updates };
+    setTerm(next);
+    if (user?.id) localStorage.setItem(termStorageKey(user.id), JSON.stringify(next));
+  };
+
+  const termLabel = `${term.season} ${term.year}`;
+  const coursesForTerm = plannedCourses.filter((c) => c.termLabel === termLabel);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [subjectCode, setSubjectCode] = useState('');
   const [courseNumber, setCourseNumber] = useState('');
-  const [termLabel, setTermLabel] = useState('');
   const [formError, setFormError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const formErrorRef = useRef(null);
@@ -103,13 +144,12 @@ function PlanAheadPage() {
     createPlannedCourse({
       subjectCode: subjectCode.trim().toUpperCase(),
       courseNumber: courseNumber.trim(),
-      termLabel: termLabel.trim(),
+      termLabel,
     })
       .then((res) => {
         setPlannedCourses([...plannedCourses, res.data]);
         setSubjectCode('');
         setCourseNumber('');
-        setTermLabel('');
         setShowAddForm(false);
       })
       .catch(() => setFormError('Could not add that course. Try again.'))
@@ -184,6 +224,22 @@ function PlanAheadPage() {
         )}
       </div>
 
+      {!selectedCourse && (
+        <div className="plan-ahead-term-picker">
+          <span className="plan-ahead-term-label">Planning for</span>
+          <select value={term.season} onChange={(e) => updateTerm({ season: e.target.value })}>
+            {SEASONS.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <select value={term.year} onChange={(e) => updateTerm({ year: Number(e.target.value) })}>
+            {years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {loadError && (
         <div className="load-error-banner">
           <span>{loadError}</span>
@@ -197,6 +253,7 @@ function PlanAheadPage() {
             {showAddForm && (
               <form className="plan-ahead-form card" onSubmit={handleAddCourse}>
                 {formError && <p className="error" ref={formErrorRef}>{formError}</p>}
+                <p className="plan-ahead-form-term-note">Adding to your {termLabel} plan</p>
                 <div className="plan-ahead-form-row">
                   <label>
                     Subject
@@ -217,14 +274,6 @@ function PlanAheadPage() {
                       required
                     />
                   </label>
-                  <label className="plan-ahead-form-term">
-                    Term <span className="plan-ahead-form-optional">(optional)</span>
-                    <input
-                      value={termLabel}
-                      onChange={(e) => setTermLabel(e.target.value)}
-                      placeholder="Spring 2027"
-                    />
-                  </label>
                   <button type="submit" className="btn-primary" disabled={submitting}>
                     {submitting ? 'Adding...' : 'Add'}
                   </button>
@@ -232,10 +281,14 @@ function PlanAheadPage() {
               </form>
             )}
 
-            {plannedCourses.length === 0 ? (
+            {coursesForTerm.length === 0 ? (
               <div className="plan-ahead-empty">
                 <Compass size={32} color="#4B5563" />
-                <p className="plan-ahead-empty-title">Scope out next semester before you register</p>
+                <p className="plan-ahead-empty-title">
+                  {plannedCourses.length === 0
+                    ? 'Scope out next semester before you register'
+                    : `Nothing planned for ${termLabel} yet`}
+                </p>
                 <p className="plan-ahead-empty-text">
                   Add a course you're considering and ScheduleDawg looks it up on the UGA course
                   bulletin — who's teaching it, their most recent syllabus (grading categories and
@@ -249,7 +302,7 @@ function PlanAheadPage() {
               </div>
             ) : (
               <div className="plan-ahead-grid">
-                {plannedCourses.map((course) => (
+                {coursesForTerm.map((course) => (
                   <button
                     key={course.id}
                     className="plan-ahead-card"
@@ -260,7 +313,7 @@ function PlanAheadPage() {
                       <h3>{course.subjectCode} {course.courseNumber}</h3>
                       <span className="plan-ahead-card-chevron">&rsaquo;</span>
                     </div>
-                    <p className="plan-ahead-card-term">{course.termLabel || 'No term set'}</p>
+                    <p className="plan-ahead-card-term">{course.termLabel}</p>
                   </button>
                 ))}
               </div>

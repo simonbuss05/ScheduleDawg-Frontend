@@ -45,7 +45,7 @@ function SyllabusPage() {
         setSyllabi(syllabiRes.data);
 
         const preselect = searchParams.get('courseId');
-        const alreadyHas = syllabiRes.data.some((s) => String(s.course?.id) === preselect);
+        const alreadyHas = syllabiRes.data.some((s) => String(s.courseId) === preselect);
         if (preselect && !alreadyHas) {
           setUploadCourseId(preselect);
           setShowUpload(true);
@@ -60,12 +60,7 @@ function SyllabusPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const courseName = (courseId) => {
-    const course = courses.find((c) => c.id === courseId);
-    return course ? `${course.code} — ${course.name}` : 'Unknown Course';
-  };
-
-  const coursesWithSyllabusIds = new Set(syllabi.map((s) => s.course?.id).filter(Boolean));
+  const coursesWithSyllabusIds = new Set(syllabi.map((s) => s.courseId).filter(Boolean));
   const coursesWithoutSyllabus = courses.filter((c) => !coursesWithSyllabusIds.has(c.id));
 
   const handleUploaded = (result) => {
@@ -153,16 +148,16 @@ function SyllabusPage() {
               <li
                 key={s.id}
                 className="syllabus-row card"
-                style={{ '--course-color': getCourseColor(s.course?.id) }}
+                style={{ '--course-color': getCourseColor(s.courseId) }}
               >
                 <div className="syllabus-info">
                   <span className="syllabus-name">{s.fileName}</span>
-                  {s.course?.id ? (
-                    <Link to={`/courses/${s.course.id}`} className="syllabus-course">
-                      {courseName(s.course.id)}
+                  {s.courseId ? (
+                    <Link to={`/courses/${s.courseId}`} className="syllabus-course">
+                      {s.courseCode} — {s.courseName}
                     </Link>
                   ) : (
-                    <span className="syllabus-course">{courseName(s.course?.id)}</span>
+                    <span className="syllabus-course">Unknown Course</span>
                   )}
                 </div>
                 <div className="syllabus-actions">
