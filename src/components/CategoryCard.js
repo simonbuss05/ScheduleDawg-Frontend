@@ -109,7 +109,9 @@ function CategoryCard({ courseId, category, onItemsLoaded, onCategoryChanged, on
       message: `"${item.title}" will be removed.`,
     });
     if (!ok) return;
-    deleteGradedItem(category.id, item.id).then(load);
+    deleteGradedItem(category.id, item.id)
+      .then(load)
+      .catch(() => setError('Could not delete that item.'));
   };
 
   const handleSaveWeight = () => {
@@ -128,10 +130,12 @@ function CategoryCard({ courseId, category, onItemsLoaded, onCategoryChanged, on
       name: category.name,
       weightPercent: weight,
       placeholderScore: category.placeholderScore,
-    }).then((res) => {
-      onCategoryChanged(res.data);
-      setEditingWeight(false);
-    });
+    })
+      .then((res) => {
+        onCategoryChanged(res.data);
+        setEditingWeight(false);
+      })
+      .catch(() => setWeightError('Could not save that weight.'));
   };
 
   const handleSavePlaceholder = () => {
@@ -150,9 +154,9 @@ function CategoryCard({ courseId, category, onItemsLoaded, onCategoryChanged, on
       name: category.name,
       weightPercent: category.weightPercent,
       placeholderScore: val,
-    }).then((res) => {
-      onCategoryChanged(res.data);
-    });
+    })
+      .then((res) => onCategoryChanged(res.data))
+      .catch(() => setPlaceholderError('Could not save that estimate.'));
   };
 
   const handleClear = () => {
@@ -167,7 +171,9 @@ function CategoryCard({ courseId, category, onItemsLoaded, onCategoryChanged, on
       message: 'All its graded items will be removed too.',
     });
     if (!ok) return;
-    deleteGradeCategory(courseId, category.id).then(() => onCategoryDeleted(category.id));
+    deleteGradeCategory(courseId, category.id)
+      .then(() => onCategoryDeleted(category.id))
+      .catch(() => setError('Could not delete that category.'));
   };
 
   return (
@@ -223,6 +229,7 @@ function CategoryCard({ courseId, category, onItemsLoaded, onCategoryChanged, on
         </div>
       )}
       {placeholderError && <p className="error">{placeholderError}</p>}
+      {error && !showItemForm && <p className="error">{error}</p>}
 
       {loading ? (
         <p className="empty-state">Loading...</p>

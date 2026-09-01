@@ -1,8 +1,17 @@
 // src/components/ConfirmDialog.js
+import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import './ConfirmDialog.css';
 
 function ConfirmDialog({ title, message, confirmLabel, danger, onConfirm, onCancel }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
+
   return (
     <div className="confirm-overlay" onClick={onCancel}>
       <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>

@@ -149,6 +149,7 @@ function PlanAheadPage() {
         setPlannedCourses(plannedCourses.filter((c) => c.id !== course.id));
         if (selectedCourse?.id === course.id) handleBackToAll();
       })
+      .catch(() => setInstructorsError('Could not remove that course. Try again.'))
       .finally(() => setDeleting(false));
   };
 

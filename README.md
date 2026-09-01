@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+# ScheduleDawg — Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React frontend for a class-schedule and grade-tracking app built for UGA
+students. This is the client half of ScheduleDawg; the API lives in a
+separate repo at [Schedule-Dawg](https://github.com/simonbuss05/Schedule-Dawg)
+(Spring Boot + Postgres).
 
-## Available Scripts
+Live at **[schedule-dawg-frontend.vercel.app](https://schedule-dawg-frontend.vercel.app)**,
+deployed on Vercel.
 
-In the project directory, you can run:
+## What it does
 
-### `npm start`
+- **Weekly and daily schedule views** — a full-week grid color-coded by
+  course, and a day-at-a-time view with today's classes, a walking route to
+  and from your first and last class (via Mapbox directions), what's due,
+  and a grade snapshot.
+- **Courses** — add/edit/delete courses with meeting days, times, and
+  building (autocompleted against real campus buildings, proxied through
+  the backend). Deleting a course cleans up its meetings, assignments,
+  events, grades, and syllabus with a single confirm.
+- **Coursework** — every assignment and event across all courses in one
+  list, grouped into Overdue / This Week / Upcoming / Done.
+- **Grades** — weighted categories, a letter-grade scale, and a target-grade
+  calculator ("what average do I need on everything left to land an A-"),
+  plus one-click "auto-fill from syllabus."
+- **Syllabus upload** — upload a PDF and an AI-extracted grading scheme
+  (categories + scale) comes back for you to review and accept before
+  anything is saved.
+- **Plan Ahead** — before registering for a future semester, add a course
+  you're considering and see who's teaching it (from UGA's public course
+  bulletin), their syllabus and grading breakdown, and a link to their
+  RateMyProfessors reviews.
+- **Semesters** — end the current semester and start a new one without
+  losing anything; past semesters stay fully browsable from a switcher in
+  the sidebar.
+- **Onboarding** — a first-run walkthrough (welcome → add a course → upload
+  a syllabus → set up grades → set a home address → feature tour) that
+  resumes from wherever you left off if you navigate away mid-flow, instead
+  of restarting or disappearing.
+- **Auth** — register/login, password reset via email, and account
+  deletion, all from Settings.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+React 19 · React Router 7 · Create React App · axios · Mapbox GL JS ·
+lucide-react
 
-### `npm test`
+## Architecture notes
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **All backend calls go through one axios instance**
+  (`src/api/axiosConfig.js`), which attaches the JWT and centralizes the API
+  base URL — nothing calls `fetch()`/`axios` against a hardcoded URL from a
+  component. The one deliberate exception is Mapbox: its public token is
+  designed to be used client-side (scoped by Mapbox via URL/referrer
+  restrictions, not by keeping it secret), so geocoding and directions calls
+  go straight from the browser to Mapbox's API.
+- **Confirm dialogs are centralized**, not one-off `window.confirm()` calls.
+  `ConfirmContext` + `useConfirm()` returns a promise from a shared styled
+  dialog component, used consistently for every destructive action (delete
+  course/assignment/event/account).
+- **CRA bakes `REACT_APP_*` vars in at build time**, not runtime — changing
+  one in your hosting platform's dashboard requires a fresh deploy to take
+  effect, not just a restart.
 
-### `npm run build`
+## Running locally
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Requires Node and a running instance of the
+[backend](https://github.com/simonbuss05/Schedule-Dawg) (defaults to
+`http://localhost:8080`).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+cp .env.example .env.local
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Set `REACT_APP_MAPBOX_TOKEN` in `.env.local` (get one free at
+[mapbox.com](https://account.mapbox.com/)) — building autocomplete works
+without it (it's proxied through the backend), but geocoding, walking
+directions, and the map itself need it. Leave `REACT_APP_API_BASE_URL`
+unset to use the local backend default.
 
-### `npm run eject`
+```bash
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Opens at `http://localhost:3000`.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Project structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+src/
+├── pages/       one component per route (HomePage, WeeklyPage, GradesPage, ...)
+├── components/  shared UI (forms, cards, the confirm dialog, onboarding flow)
+├── api/         one file per resource, thin wrappers around the shared axios instance
+├── context/     AuthContext (session/JWT), ConfirmContext (shared confirm dialog)
+├── utils/       geocoding, campus building lookup/cache
+└── styles/      shared design tokens (colors, spacing) used across page CSS
+```

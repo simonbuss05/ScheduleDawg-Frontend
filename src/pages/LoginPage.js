@@ -1,16 +1,19 @@
 // src/pages/LoginPage.js
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css';
 
 function LoginPage() {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,6 +30,9 @@ function LoginPage() {
       <form className="auth-card" onSubmit={handleSubmit}>
         <h1 className="auth-logo">ScheduleDawg</h1>
         <h2 className="auth-title">Log in</h2>
+        {location.state?.passwordChanged && !error && (
+          <p className="success">Password updated. Log in with your new password.</p>
+        )}
         {error && <p className="error">{error}</p>}
 
         <label>

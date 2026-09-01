@@ -74,9 +74,9 @@ function CourseworkPage() {
 
   const handleToggleComplete = (assignment) => {
     const updated = { ...assignment, completed: !assignment.completed };
-    updateAssignment(assignment.course.id, assignment.id, updated).then(() => {
-      setAssignments(assignments.map((a) => (a.id === assignment.id ? updated : a)));
-    });
+    updateAssignment(assignment.course.id, assignment.id, updated)
+      .then(() => setAssignments(assignments.map((a) => (a.id === assignment.id ? updated : a))))
+      .catch(() => setLoadError('Could not update that assignment. Try again.'));
   };
 
   const handleDelete = async (item) => {
@@ -261,7 +261,7 @@ function CourseworkPage() {
         {filteredCourse && (
           <span className="filter-active-chip">
             Filtered to {filteredCourse.code}
-            <button className="filter-clear-btn" onClick={() => setFilterCourseId('')}>×</button>
+            <button className="filter-clear-btn" onClick={() => setFilterCourseId('')} aria-label="Clear course filter">×</button>
           </span>
         )}
       </div>

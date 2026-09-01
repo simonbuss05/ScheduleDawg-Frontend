@@ -72,9 +72,9 @@ function HomePage() {
 
   const handleToggleAssignmentComplete = (assignment) => {
     const updated = { ...assignment, completed: !assignment.completed };
-    updateAssignment(assignment.course.id, assignment.id, updated).then(() => {
-      setAllAssignments(allAssignments.map((a) => (a.id === assignment.id ? updated : a)));
-    });
+    updateAssignment(assignment.course.id, assignment.id, updated)
+      .then(() => setAllAssignments(allAssignments.map((a) => (a.id === assignment.id ? updated : a))))
+      .catch(() => setLoadError('Could not update that assignment. Try again.'));
   };
 
   const goToPrevDay = () => setSelectedDate(addDays(selectedDate, -1));

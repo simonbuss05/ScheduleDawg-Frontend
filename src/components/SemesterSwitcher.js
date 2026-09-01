@@ -11,6 +11,7 @@ function SemesterSwitcher() {
   const [open, setOpen] = useState(false);
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const wrapperRef = useRef(null);
 
@@ -39,16 +40,22 @@ function SemesterSwitcher() {
 
   const handleStartNewSemester = (e) => {
     e.preventDefault();
+    setError(null);
     if (!newName.trim()) return;
-    createSemester(newName.trim()).then(() => {
-      // Reload so every page's own course fetch picks up the new active
-      // semester — simplest way to invalidate app-wide state at once.
-      window.location.reload();
-    });
+    createSemester(newName.trim())
+      .then(() => {
+        // Reload so every page's own course fetch picks up the new active
+        // semester — simplest way to invalidate app-wide state at once.
+        window.location.reload();
+      })
+      .catch(() => setError('Could not start a new semester.'));
   };
 
   const handleResume = (id) => {
-    activateSemester(id).then(() => window.location.reload());
+    setError(null);
+    activateSemester(id)
+      .then(() => window.location.reload())
+      .catch(() => setError('Could not switch semesters.'));
   };
 
   const handleView = (id) => {
@@ -68,6 +75,7 @@ function SemesterSwitcher() {
       {open && (
         <div className="semester-switcher-panel">
           <div className="semester-switcher-label">Semesters</div>
+          {error && <p className="error">{error}</p>}
           <ul className="semester-list">
             {semesters.map((s) => (
               <li key={s.id} className={`semester-list-row ${s.active ? 'is-active' : ''}`}>

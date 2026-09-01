@@ -28,6 +28,7 @@ function CourseDetailPage() {
   const [events, setEvents] = useState([]);
   const [syllabi, setSyllabi] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   const [showMeetingForm, setShowMeetingForm] = useState(false);
@@ -49,7 +50,9 @@ function CourseDetailPage() {
     };
   }, [viewingSyllabus, syllabi]);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
+    setLoadError(null);
     Promise.all([
       getCourseById(courseId),
       getMeetings(courseId),
@@ -62,8 +65,19 @@ function CourseDetailPage() {
       setAssignments(assignmentsRes.data);
       setEvents(eventsRes.data);
       setSyllabi(syllabiRes.data);
-      setLoading(false);
-    });
+    })
+      .catch((err) =>
+        setLoadError(
+          err.response?.status === 404
+            ? 'Course not found. It may have been deleted.'
+            : 'Could not load this course. Is the backend running?'
+        )
+      )
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
@@ -131,6 +145,7 @@ function CourseDetailPage() {
   };
 
   if (loading) return <p>Loading course...</p>;
+  if (loadError) return <p className="error">{loadError}</p>;
   if (!course) return <p>Course not found.</p>;
 
   const DAY_ORDER = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];

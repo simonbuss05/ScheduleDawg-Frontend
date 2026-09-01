@@ -50,7 +50,7 @@ function SyllabusUploadForm({ courseId, onUploaded, onCancel }) {
       {file ? (
         <div className="file-chip">
           <span className="file-chip-name">{file.name}</span>
-          <button type="button" className="file-chip-remove" onClick={handleRemoveFile}>
+          <button type="button" className="file-chip-remove" onClick={handleRemoveFile} aria-label="Remove selected file">
             ×
           </button>
         </div>

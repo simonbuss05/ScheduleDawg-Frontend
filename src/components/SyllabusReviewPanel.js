@@ -20,6 +20,7 @@ function SyllabusReviewPanel({ courseId, grading, onSaved, onDismiss }) {
     }))
   );
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const updateCategory = (key, field, value) => {
     setCategories(categories.map((c) => (c.key === key ? { ...c, [field]: value } : c)));
@@ -33,20 +34,39 @@ function SyllabusReviewPanel({ courseId, grading, onSaved, onDismiss }) {
 
   const handleSave = () => {
     setSaving(true);
+    setSaveError(null);
 
     const validCategories = categories.filter((c) => c.name.trim() && c.weightPercent !== '');
     const validScale = scale.filter((s) => s.letter.trim() && s.minPercent !== '');
 
-    Promise.all([
+    // allSettled rather than all: a syllabus can produce a dozen rows, and
+    // one bad one (e.g. a weight the backend rejects) shouldn't strand the
+    // rest unsaved. Whatever succeeds is removed from the panel so a retry
+    // only resubmits what actually failed, instead of creating duplicates
+    // of rows that already saved.
+    Promise.allSettled([
       ...validCategories.map((c) =>
-        createGradeCategory(courseId, { name: c.name, weightPercent: Number(c.weightPercent) })
+        createGradeCategory(courseId, { name: c.name, weightPercent: Number(c.weightPercent) }).then(() => c.key)
       ),
       ...validScale.map((s) =>
-        createGradeScaleEntry(courseId, { letter: s.letter, minPercent: Number(s.minPercent) })
+        createGradeScaleEntry(courseId, { letter: s.letter, minPercent: Number(s.minPercent) }).then(() => s.key)
       ),
-    ])
-      .then(() => onSaved())
-      .finally(() => setSaving(false));
+    ]).then((results) => {
+      const savedKeys = new Set(results.filter((r) => r.status === 'fulfilled').map((r) => r.value));
+      const failedCount = results.filter((r) => r.status === 'rejected').length;
+
+      setCategories((prev) => prev.filter((c) => !savedKeys.has(c.key)));
+      setScale((prev) => prev.filter((s) => !savedKeys.has(s.key)));
+
+      if (failedCount === 0) {
+        onSaved();
+      } else {
+        setSaveError(
+          `${failedCount} ${failedCount === 1 ? 'entry' : 'entries'} couldn't be saved. The rest were saved — fix and retry the remaining ${failedCount === 1 ? 'one' : 'ones'} below.`
+        );
+        setSaving(false);
+      }
+    });
   };
 
   const nothingFound = categories.length === 0 && scale.length === 0;
@@ -104,6 +124,8 @@ function SyllabusReviewPanel({ courseId, grading, onSaved, onDismiss }) {
           ))}
         </div>
       )}
+
+      {saveError && <p className="error">{saveError}</p>}
 
       <div className="form-actions">
         <button type="button" className="btn-secondary" onClick={onDismiss}>

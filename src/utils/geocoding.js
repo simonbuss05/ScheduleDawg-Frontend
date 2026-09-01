@@ -1,4 +1,5 @@
 // src/utils/geocoding.js
+import api from '../api/axiosConfig';
 import { getCachedCoords, setCachedCoords } from './geocodeCache';
 import { getBuildingOverride } from './buildingOverrides';
 
@@ -52,20 +53,18 @@ async function tryMapboxBuilding(building) {
   return { lat, lng, placeName: feature.place_name };
 }
 
+// Routed through the backend (see GeocodingController) rather than calling
+// Nominatim directly — Nominatim's usage policy requires a descriptive
+// User-Agent, which a browser fetch can't set, and rate-limits per client at
+// a level a shared public instance being hit directly from every user's
+// browser can trip.
 async function tryNominatim(building) {
-  const query = `${building}, University of Georgia, Athens, GA`;
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-    query
-  )}&limit=1&viewbox=${ATHENS_BBOX}&bounded=1`;
-
-  const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
-  if (!res.ok) return null;
-
-  const data = await res.json();
-  if (!data || data.length === 0) return null;
-
-  const match = data[0];
-  return { lat: parseFloat(match.lat), lng: parseFloat(match.lon), placeName: match.display_name };
+  try {
+    const res = await api.get('/geocode/building', { params: { query: building } });
+    return { lat: res.data.lat, lng: res.data.lng, placeName: res.data.placeName };
+  } catch {
+    return null;
+  }
 }
 
 export async function geocodeBuilding(building) {

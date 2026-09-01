@@ -144,12 +144,14 @@ function GradesPage() {
     createGradeCategory(selectedCourse.id, {
       name: newCategoryName.trim(),
       weightPercent: weight,
-    }).then((res) => {
-      setCategories([...categories, res.data]);
-      setNewCategoryName('');
-      setNewCategoryWeight('');
-      setShowCategoryForm(false);
-    });
+    })
+      .then((res) => {
+        setCategories([...categories, res.data]);
+        setNewCategoryName('');
+        setNewCategoryWeight('');
+        setShowCategoryForm(false);
+      })
+      .catch(() => setCategoryFormError('Could not add that category.'));
   };
 
   const handleAddScaleEntry = (e) => {
@@ -177,12 +179,14 @@ function GradesPage() {
     createGradeScaleEntry(selectedCourse.id, {
       letter: newScaleLetter.trim(),
       minPercent: min,
-    }).then((res) => {
-      setScale([...scale, res.data]);
-      setNewScaleLetter('');
-      setNewScaleMin('');
-      setShowScaleForm(false);
-    });
+    })
+      .then((res) => {
+        setScale([...scale, res.data]);
+        setNewScaleLetter('');
+        setNewScaleMin('');
+        setShowScaleForm(false);
+      })
+      .catch(() => setScaleFormError('Could not add that grade cutoff.'));
   };
 
   const handleDeleteScaleEntry = async (scaleEntry) => {
@@ -191,9 +195,9 @@ function GradesPage() {
       message: `"${scaleEntry.letter}" (${scaleEntry.minPercent}%+) will be removed.`,
     });
     if (!ok) return;
-    deleteGradeScaleEntry(selectedCourse.id, scaleEntry.id).then(() => {
-      setScale(scale.filter((s) => s.id !== scaleEntry.id));
-    });
+    deleteGradeScaleEntry(selectedCourse.id, scaleEntry.id)
+      .then(() => setScale(scale.filter((s) => s.id !== scaleEntry.id)))
+      .catch(() => setScaleFormError('Could not delete that grade cutoff.'));
   };
 
   const handleCalculateTarget = (e) => {
@@ -228,7 +232,9 @@ function GradesPage() {
       name: category.name,
       weightPercent: category.weightPercent,
       placeholderScore: null,
-    }).then((res) => handleCategoryChanged(res.data));
+    })
+      .then((res) => handleCategoryChanged(res.data))
+      .catch(() => setCategoryFormError('Could not clear that estimate.'));
   };
 
   const sortedScale = [...scale].sort((a, b) => b.minPercent - a.minPercent);
@@ -380,6 +386,7 @@ function GradesPage() {
                       {showScaleForm ? 'Cancel' : '+ Add'}
                     </button>
                   </div>
+                  {scaleFormError && !showScaleForm && <p className="error">{scaleFormError}</p>}
                   {showScaleForm && (
                     <form className="scale-form" onSubmit={handleAddScaleEntry}>
                       {scaleFormError && <p className="error">{scaleFormError}</p>}
@@ -410,7 +417,7 @@ function GradesPage() {
                               {s.minPercent}
                               {upperBound > s.minPercent ? ` - ${upperBound.toFixed(1)}` : ''}
                             </span>
-                            <button className="icon-btn" onClick={() => handleDeleteScaleEntry(s)}>×</button>
+                            <button className="icon-btn" onClick={() => handleDeleteScaleEntry(s)} aria-label="Delete grade cutoff">×</button>
                           </li>
                         );
                       })}
@@ -434,6 +441,7 @@ function GradesPage() {
                   </p>
                 )}
 
+                {categoryFormError && !showCategoryForm && <p className="error">{categoryFormError}</p>}
                 {showCategoryForm && (
                   <form className="category-form" onSubmit={handleAddCategory}>
                     {categoryFormError && <p className="error">{categoryFormError}</p>}

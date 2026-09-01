@@ -11,14 +11,17 @@ function CourseGradeSummary({ courseId, onColor }) {
   const [itemsByCategoryId, setItemsByCategoryId] = useState({});
   const [scale, setScale] = useState(null);
   const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    Promise.all([getGradeCategories(courseId), getGradeScale(courseId)]).then(
-      ([catRes, scaleRes]) => {
+    setLoaded(false);
+    setFailed(false);
+    Promise.all([getGradeCategories(courseId), getGradeScale(courseId)])
+      .then(([catRes, scaleRes]) => {
         setCategories(catRes.data);
         setScale(scaleRes.data);
 
-        Promise.all(catRes.data.map((c) => getGradedItems(c.id))).then((responses) => {
+        return Promise.all(catRes.data.map((c) => getGradedItems(c.id))).then((responses) => {
           const map = {};
           catRes.data.forEach((c, i) => {
             map[c.id] = responses[i].data;
@@ -26,11 +29,15 @@ function CourseGradeSummary({ courseId, onColor }) {
           setItemsByCategoryId(map);
           setLoaded(true);
         });
-      }
-    );
+      })
+      .catch(() => setFailed(true));
   }, [courseId]);
 
   const emptyClass = `grade-summary-empty${onColor ? ' on-color' : ''}`;
+
+  if (failed) {
+    return <span className={emptyClass}>Couldn't load grade</span>;
+  }
 
   if (!loaded) {
     return <span className={`grade-summary-loading${onColor ? ' on-color' : ''}`}>Loading...</span>;

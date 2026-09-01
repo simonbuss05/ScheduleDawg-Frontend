@@ -9,3 +9,5 @@ export const changePassword = (currentPassword, newPassword) =>
 export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
 export const resetPassword = (token, newPassword) =>
   api.post('/auth/reset-password', { token, newPassword });
+export const deleteAccount = (password) =>
+  api.delete('/auth/account', { data: { password } });

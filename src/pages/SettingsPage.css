@@ -84,3 +84,7 @@
   font-weight: 600;
   color: var(--color-text);
 }
+
+.danger-zone {
+  border-color: var(--color-primary);
+}

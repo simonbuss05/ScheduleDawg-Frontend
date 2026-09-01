@@ -1,16 +1,18 @@
 // src/pages/RegisterPage.js
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css';
 
 function RegisterPage() {
-  const { register } = useAuth();
+  const { user, register } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = (e) => {
     e.preventDefault();

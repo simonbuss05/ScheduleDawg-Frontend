@@ -1,9 +1,11 @@
 // src/pages/SettingsPage.js
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getSettings, updateSettings } from '../api/settingsApi';
-import { changePassword } from '../api/authApi';
+import { changePassword, deleteAccount } from '../api/authApi';
 import { geocodeAddress } from '../utils/geocoding';
 import { useAuth } from '../context/AuthContext';
+import { useConfirm } from '../context/ConfirmContext';
 import './SettingsPage.css';
 
 function combineAddress({ street, city, state, zip }) {
@@ -11,7 +13,9 @@ function combineAddress({ street, city, state, zip }) {
 }
 
 function SettingsPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const confirm = useConfirm();
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -28,6 +32,10 @@ function SettingsPage() {
   const [passwordError, setPasswordError] = useState(null);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     getSettings().then((res) => {
@@ -86,13 +94,46 @@ function SettingsPage() {
     setChangingPassword(true);
     changePassword(currentPassword, newPassword)
       .then(() => {
-        setPasswordSuccess(true);
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
+        // Changing the password invalidates every session, including this
+        // one (see AuthService.changePassword / JwtAuthenticationFilter) —
+        // the current token stops working on the very next request, so log
+        // out proactively instead of leaving the page looking successful
+        // right up until some other action mysteriously 401s.
+        logout();
+        navigate('/login', { state: { passwordChanged: true } });
       })
-      .catch((err) => setPasswordError(err.response?.data?.message || 'Could not change your password.'))
-      .finally(() => setChangingPassword(false));
+      .catch((err) => {
+        setPasswordError(err.response?.data?.message || 'Could not change your password.');
+        setChangingPassword(false);
+      });
+  };
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    setDeleteError(null);
+
+    if (!deletePassword) {
+      setDeleteError('Enter your password to confirm.');
+      return;
+    }
+
+    const ok = await confirm({
+      title: 'Delete your account?',
+      message: 'This permanently deletes your account and everything in it — courses, assignments, events, grades, and syllabi. This cannot be undone.',
+      confirmLabel: 'Delete Account',
+    });
+    if (!ok) return;
+
+    setDeleting(true);
+    deleteAccount(deletePassword)
+      .then(() => {
+        logout();
+        navigate('/login');
+      })
+      .catch((err) => {
+        setDeleteError(err.response?.data?.message || 'Could not delete your account.');
+        setDeleting(false);
+      });
   };
 
   if (loading) return <p>Loading settings...</p>;
@@ -208,6 +249,32 @@ function SettingsPage() {
 
             <button type="submit" className="btn-primary" disabled={changingPassword}>
               {changingPassword ? 'Updating...' : 'Change Password'}
+            </button>
+          </form>
+        </div>
+
+        <div className="settings-section danger-zone">
+          <h3>Delete Account</h3>
+          <p className="settings-description">
+            Permanently deletes your account and everything in it — courses, assignments, events,
+            grades, and syllabi. This cannot be undone.
+          </p>
+
+          <form className="settings-form" onSubmit={handleDeleteAccount}>
+            {deleteError && <p className="error">{deleteError}</p>}
+
+            <label>
+              Password
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                required
+              />
+            </label>
+
+            <button type="submit" className="btn-danger-solid" disabled={deleting}>
+              {deleting ? 'Deleting...' : 'Delete Account'}
             </button>
           </form>
         </div>
