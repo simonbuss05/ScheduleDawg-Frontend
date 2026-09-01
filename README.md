@@ -2,11 +2,11 @@
 
 A React frontend for a class-schedule and grade-tracking app built for UGA
 students. This is the client half of ScheduleDawg; the API lives in a
-separate repo at [Schedule-Dawg](https://github.com/simonbuss05/Schedule-Dawg)
+separate repo at [ScheduleDawg-Backend](https://github.com/simonbuss05/ScheduleDawg-Backend)
 (Spring Boot + Postgres).
 
-Live at **[schedule-dawg-frontend.vercel.app](https://schedule-dawg-frontend.vercel.app)**,
-deployed on Vercel.
+Live at **[www.scheduledawg.com](https://www.scheduledawg.com)**, deployed on
+Vercel.
 
 ## What it does
 
@@ -26,17 +26,21 @@ deployed on Vercel.
 - **Syllabus upload** — upload a PDF and an AI-extracted grading scheme
   (categories + scale) comes back for you to review and accept before
   anything is saved.
-- **Plan Ahead** — before registering for a future semester, add a course
-  you're considering and see who's teaching it (from UGA's public course
-  bulletin), their syllabus and grading breakdown, and a link to their
-  RateMyProfessors reviews.
+- **Plan Ahead** — before registering for a future semester, pick a term
+  (Fall/Spring/Summer + year), add courses you're considering for it, and
+  see who's teaching each one (from UGA's public course bulletin), their
+  syllabus and grading breakdown, and a link to their RateMyProfessors
+  reviews. Each term keeps its own separate list, so a Spring plan and a
+  Summer plan don't mix.
 - **Semesters** — end the current semester and start a new one without
   losing anything; past semesters stay fully browsable from a switcher in
   the sidebar.
 - **Onboarding** — a first-run walkthrough (welcome → add a course → upload
-  a syllabus → set up grades → set a home address → feature tour) that
-  resumes from wherever you left off if you navigate away mid-flow, instead
-  of restarting or disappearing.
+  a syllabus → set up grades → set a home address → feature tour). A few
+  steps send you off to a real page to do the thing; the overlay reappears
+  the moment that task actually finishes — not just whenever you happen to
+  navigate elsewhere — so it feels like one continuous flow instead of
+  something you have to manually resume.
 - **Auth** — register/login, password reset via email, and account
   deletion, all from Settings.
 
@@ -58,6 +62,11 @@ lucide-react
   `ConfirmContext` + `useConfirm()` returns a promise from a shared styled
   dialog component, used consistently for every destructive action (delete
   course/assignment/event/account).
+- **Onboarding is one shared context, not page-local state.**
+  `OnboardingContext` (provided in `Layout`) is what lets the overlay
+  appear on top of any route and lets task pages (Syllabus, Grades,
+  Settings) call back into it the instant their task completes, instead of
+  onboarding only knowing how to render itself inside the Home page.
 - **CRA bakes `REACT_APP_*` vars in at build time**, not runtime — changing
   one in your hosting platform's dashboard requires a fresh deploy to take
   effect, not just a restart.
@@ -65,7 +74,7 @@ lucide-react
 ## Running locally
 
 Requires Node and a running instance of the
-[backend](https://github.com/simonbuss05/Schedule-Dawg) (defaults to
+[backend](https://github.com/simonbuss05/ScheduleDawg-Backend) (defaults to
 `http://localhost:8080`).
 
 ```bash
@@ -92,7 +101,8 @@ src/
 ├── pages/       one component per route (HomePage, WeeklyPage, GradesPage, ...)
 ├── components/  shared UI (forms, cards, the confirm dialog, onboarding flow)
 ├── api/         one file per resource, thin wrappers around the shared axios instance
-├── context/     AuthContext (session/JWT), ConfirmContext (shared confirm dialog)
+├── context/     AuthContext (session/JWT), ConfirmContext (shared confirm dialog),
+│                OnboardingContext (first-run tour, shared across pages)
 ├── utils/       geocoding, campus building lookup/cache
 └── styles/      shared design tokens (colors, spacing) used across page CSS
 ```
