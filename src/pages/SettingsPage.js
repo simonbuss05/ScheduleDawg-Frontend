@@ -149,7 +149,7 @@ function SettingsPage() {
         <h2 className="page-title">Settings</h2>
       </div>
 
-      <div className="scroll-region">
+      <div className="scroll-region settings-scroll-region">
         <div className="settings-section">
           <h3>Home Address</h3>
           <p className="settings-description">

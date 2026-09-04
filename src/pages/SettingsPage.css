@@ -8,10 +8,13 @@
   margin-bottom: 24px;
 }
 
-.scroll-region {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+/* Scoped, not just `.scroll-region` — that class is reused unscoped by
+   every page's own CSS file (CoursesPage, GradesPage, CourseworkPage,
+   etc.), so adding display:flex/gap here would leak into all of them via
+   the cascade and make their sections shrink to fit instead of scrolling.
+   Settings specifically wants its two cards stacked with a gap; nothing
+   else should inherit that. */
+.settings-scroll-region {
   display: flex;
   flex-direction: column;
   gap: 20px;
