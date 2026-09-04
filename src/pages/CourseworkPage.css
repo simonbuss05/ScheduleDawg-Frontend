@@ -46,8 +46,44 @@
 
 .scroll-region {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
+}
+
+/* Scoped, not just `.scroll-region` (see SettingsPage.css for why that
+   class can't safely carry page-specific layout unscoped). Coursework
+   wants all of its category sections visible at once, each scrolling
+   within its own bounded area, instead of one long page-level scroll —
+   the opposite problem from the bug this exact pattern caused before, so
+   here every level that needs to be able to shrink below its content size
+   (min-height: 0) is paired with the one level that actually scrolls
+   (.coursework-list's overflow-y), rather than shrinking with nowhere for
+   the clipped content to go. */
+.coursework-scroll-region {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.coursework-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 0;
+  /* Belt-and-suspenders: whatever happens inside (a child with its own
+     min-height, a long empty-state line, etc.), it must never spill past
+     this section's own allocated space and overlap the next one — clip it
+     instead. The list inside still gets to scroll via its own
+     overflow-y, this only bounds the section as a whole. */
+  overflow: hidden;
+}
+
+/* An empty section only needs room for its header and "Nothing yet"
+   line — don't let it claim an equal share of the page next to sections
+   that actually have content to scroll through. */
+.coursework-section.is-empty {
+  flex: 0 0 auto;
 }
 
 .section-label {
@@ -57,19 +93,28 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-muted);
-  margin: 24px 0 10px;
+  margin: 0 0 10px;
+  flex-shrink: 0;
 }
 
-.section-label:first-of-type {
-  margin-top: 8px;
+.coursework-section:first-child .section-label {
+  margin-top: 0;
 }
 
 .coursework-table {
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.coursework-section.is-empty .coursework-table {
+  flex: 0 0 auto;
 }
 
 .coursework-table-header,
@@ -89,12 +134,15 @@
   text-transform: uppercase;
   letter-spacing: 0.4px;
   color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 .coursework-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .coursework-row {
@@ -194,6 +242,7 @@
   margin: 0;
   color: var(--color-text-muted);
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .filter-row {

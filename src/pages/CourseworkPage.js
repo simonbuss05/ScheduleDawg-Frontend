@@ -193,7 +193,7 @@ function CourseworkPage() {
   );
 
   const renderSection = (title, list, emptyMessage) => (
-    <>
+    <div className={`coursework-section ${list.length === 0 ? 'is-empty' : ''}`}>
       <h3 className="section-label">{title}</h3>
       <div className="coursework-table">
         {tableHeader}
@@ -203,7 +203,7 @@ function CourseworkPage() {
           <ul className="coursework-list">{list.map(renderRow)}</ul>
         )}
       </div>
-    </>
+    </div>
   );
 
   return (
@@ -310,7 +310,7 @@ function CourseworkPage() {
         </div>
       )}
 
-      <div className="scroll-region">
+      <div className="scroll-region coursework-scroll-region">
         {overdue.length > 0 && renderSection('Overdue', overdue, '')}
         {renderSection('This Week', thisWeek, 'Nothing this week.')}
         {renderSection('Upcoming', upcoming, 'Nothing further out.')}
